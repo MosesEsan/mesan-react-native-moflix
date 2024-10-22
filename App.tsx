@@ -1,12 +1,20 @@
 import React from 'react';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
 import RootNavigator from "./app/navigation/AppRoute";
 //import RootNavigator from "./app/navigation/AppTabs";
 import ProviderContainer from "./app/ProviderContainer";
 
-export default function App() : React.JSX.Element {
+// Create a client
+const queryClient = new QueryClient()
+
+export default function App(): React.JSX.Element {
   return (
     <ProviderContainer>
-      <RootNavigator/>
+      <QueryClientProvider client={queryClient}>
+        <RootNavigator />
+      </QueryClientProvider>
     </ProviderContainer>
   );
 }
