@@ -29,26 +29,39 @@ export async function getSections() {
 }
 
 // Get Section Panels
-export async function getDashboard(params = {}, callback, onError) {
+export async function getDashboard(params = {}) {
     try {
         let endpoints = getUrls(params['section']);
         const urls = endpoints.map(({ url }) => axios.get(url, HEADERS));
 
         // let res = await axios.get(`${API_URL}${SECTIONS_ENDPOINT}/${params['id']}`);
         let res = await axios.all(urls);
-        // return res.data;
-        createPanels(res, endpoints, callback)
+        let panels = [];
+        res.map((result, idx) => {
+            let panel = { ...endpoints[idx] };    
+            let data = result.data.genres || result.data.results || [];
+    
+            // If it is ther first (Trending), use the first item a the Hero item and the rest fopr the carousel
+            if (idx === 1) {
+                panels.unshift({ id:0, type:"showcase", item_type:"showcase", data: data[0] })
+                data = data.slice(1)
+            }
+            panel = { ...panel, data, title: panel.name };
+            panels.push(panel)
+        });
+        return panels;
     } catch (e) {
         throw new Error(e);
     }
 }
 
 // Get Panel Data
-export async function getPanel(params = {}) {
+export async function getPanel(path, params = {}) {
     try {
         // let url = `${API_URL}${PANEL_ENDPOINT}`
-        // if (Object.keys(params).length !== 0) url = `${url}?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
-        let res = await axios.get(params?.panel);
+        let url = `${path}`
+        if (Object.keys(params).length !== 0) url = `${url}?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
+        let res = await axios.get(url, HEADERS);
         return res.data;
     } catch (e) {
         throw new Error(e);
