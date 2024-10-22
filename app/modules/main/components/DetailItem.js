@@ -233,12 +233,17 @@ function CastCrewItem(props) {
         }
     }
 
-
+    const renderImage = () => {
+        let gender = item?.gender || 0;
+        let source = item?.profile_path ? { uri: `${IMAGE_URL}${item?.profile_path}` } : (gender == 0) ? require("../images/cast-male-empty.png") : require("../images/cast-female-empty.png");
+        return <Image imageStyle={styles.image} style={styles.image} source={source} />
+    }
+    
     let subtitle = item?.character || item?.job || ""
     return (
         <View style={[styles.container]}>
             <View style={styles.image}>
-                <Image source={{ uri: `${IMAGE_URL}${item?.profile_path}` || "" }} style={styles.image} />
+                {renderImage()}
             </View>
             <View style={{ flex: 1 }}>
                 <Text style={styles.role}>{subtitle}</Text>
@@ -279,11 +284,16 @@ function SeasonsItem(props) {
         },
     }
 
+    const renderImage = () => {
+        let source = item?.poster_path ? { uri: `${IMAGE_URL}${item?.poster_path}` } : require("../images/media-empty.png");
+        return <Image imageStyle={styles.image} style={styles.image} source={source} />
+    }
+
     let onPress = () => navigation.push('List', { title: item.name, columns: 1, type: "episodes", season_number: item?.season_number, series_id: item?.series_id });
     return (
         <Pressable onPress={onPress}>
             <View style={styles.container}>
-                <Image imageStyle={styles.image} style={styles.image} source={{ uri: `${IMAGE_URL}${item?.poster_path}` || "" }} />
+                {renderImage()}
                 <View>
                     <Text style={styles.title} numberOfLines={2}>{item.name}</Text>
                     <Text style={styles.type}>{`${item.episode_count} Episodes`}</Text>
