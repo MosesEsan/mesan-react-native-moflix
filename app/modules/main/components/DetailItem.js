@@ -203,11 +203,8 @@ function CastCrewItem(props) {
     const { item } = props;
     const styles = {
         container: {
-            // borderRadius: 50,
             justifyContent: "center",
             alignItems: "center",
-
-            // paddingRight: 15, 
             marginHorizontal: 8,
             flexDirection: "row",
             flex: 1,
@@ -228,8 +225,9 @@ function CastCrewItem(props) {
             color: "#fff"
         },
         image: {
-            height: 45,
-            width: 45, borderRadius: 45 / 2,
+            height: 55,
+            width: 55, 
+            borderRadius: 55 / 2,
             backgroundColor: colors.secondary,
             marginRight: 15,
         }
