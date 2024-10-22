@@ -140,16 +140,23 @@ export function ShowCaseItem({ item }) {
         }
     };
 
+    const renderImage = () => {
+        let source = item?.poster_path ? { uri: `${IMAGE_URL}${item?.poster_path}` } : require("../images/media-empty.png");
+        return (
+            <ImageBackground imageStyle={styles.showcaseImage} style={styles.showcaseImage} source={source}>
+                {/* <View style={styles.overlay} /> */}
+                <LinearGradient style={styles.overlay} colors={["rgba(0, 0, 0, 0.9)", "transparent", "rgba(0, 0, 0, 0.6)"]} />
+            </ImageBackground>
+        )
+    }
+
     // ==========================================================================================
     // 4 - RENDER VIEW
     // ========================================================================================== 
     return (
         <Pressable onPress={onPress}>
             <View style={[styles.container]}>
-                <ImageBackground imageStyle={styles.showcaseImage} style={styles.showcaseImage} source={{ uri: `${IMAGE_URL}${poster_path}` || "" }}>
-                    {/* <View style={styles.overlay} /> */}
-                    <LinearGradient style={styles.overlay} colors={["rgba(0, 0, 0, 0.9)", "transparent", "rgba(0, 0, 0, 0.6)"]} />
-                </ImageBackground>
+                {renderImage()}
                 <View style={[styles.metaContainer]}>
                     <Text style={styles.title}>
                         {item?.title || item?.name}
@@ -228,13 +235,18 @@ export function MediaItem(props) {
         containerStyle.push({ width: width })
     }
 
+    const renderImage = () => {
+        let source = item?.poster_path ? { uri: `${IMAGE_URL}${item?.poster_path}` } : require("../images/media-empty.png");
+        return <ImageBackground imageStyle={[styles.image, style]} style={[style]} source={source} />
+    }
+
     // ==========================================================================================
     // 4 - RENDER VIEW
     // ========================================================================================== 
     return (
         <Pressable onPress={onPress}>
             <View style={[containerStyle]}>
-                <ImageBackground imageStyle={[styles.image, style]} style={[style]} source={{ uri: `${IMAGE_URL}${poster_path}` || "" }} />
+                {renderImage()}
                 <Text style={styles.title} numberOfLines={2}>{item?.title || item?.name}</Text>
             </View>
         </Pressable>
