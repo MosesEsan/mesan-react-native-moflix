@@ -97,23 +97,15 @@ export default function Dashboard({}) {
 
         setLoading(true, refresh);
 
-
-        // REMOVE SETTIMEOUT
-        setTimeout(async () => {
-
-            try {
-                // pass the selected section to the params instead
-                if (section) params = { ...params, 'section': section.id }
-                getDashboard(params, (response) => onCompleted(response?.panels), onError);
-                // let response = await getDashboard(params)
-                // console.log(response)
-
-                // onCompleted(response?.panels);
-            } catch (error) {
-                alert(error.message)
-                onError(error);
-            }
-        }, 2000)
+        try {
+            // pass the selected section to the params instead
+            if (section) params = { ...params, 'section': section.id }
+            let response = await getDashboard(params)
+            onCompleted(response);
+        } catch (error) {
+            alert(error.message)
+            onError(error);
+        }
     }
 
     //===========================================================================================
