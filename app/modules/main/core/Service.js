@@ -7,21 +7,46 @@ const DISCOVER_ENDPOINT = 'discover/'
 const FIND_ENDPOINT = 'movie/'
 const SEARCH_ENDPOINT = 'search/'
 
-const HEADERS = {
+export const HEADERS = {
     headers: {
         accept: 'application/json',
         Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhM2UzYTFkNzkyMzVhMWVmMTg5ZGJiMGMyNDNmMjQwZSIsIm5iZiI6MTcyNjAxMTkzNS4zMTY3ODUsInN1YiI6IjU2MDJkMDc0YzNhMzY4NTU0MTAwMjE5MyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.j0uqlo6JAwjS1dKZoakPNgls0R1g1kCA5gwmWhmH3mw`
     }
 }
+// =============================================================================================
+// HELPER FUNCTIONS
+// =============================================================================================
+export async function apiCall(url, params, headers={}) {
+    try {
+        url = `${url}?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
+        let res = await axios.get(url, headers);
+        return res.data;
+    } catch (e) {
+        throw new Error(e);
+    }
+}
+
+// =============================================================================================
+// CRUD OPERATIONS
+// =============================================================================================
+// GET ALL DATA - INDEX
+export async function getAll(params = {language: 'en-US'}) {
+    // return apiCall(`${API_URL}${FIND_ENDPOINT}/912649/videos`, params, HEADERS);
+}
+
+// OTHER CRUD OPERATIONS
+// READ CONTENT - GET DETAILS
+export async function getDetails(type, id, params) {
+    return apiCall(`${API_URL}${type}/${id}`, params, HEADERS);
+}
 
 // ===============================================================================================
 // PANELS ENDPOINTS
 // ===============================================================================================
-
 // Get the Sections List
 export async function getSections() {
+    // return apiCall(`${API_URL}${SECTIONS_ENDPOINT}`, params, HEADERS);
     try {
-        // let res = await axios.get(`${API_URL}${SECTIONS_ENDPOINT}`);
         return { sections };
     } catch (e) {
         throw new Error(e);
@@ -57,94 +82,34 @@ export async function getDashboard(params = {}) {
 
 // Get Panel Data
 export async function getPanel(path, params = {}) {
-    try {
-        // let url = `${API_URL}${PANEL_ENDPOINT}`
-        let url = `${path}`
-        if (Object.keys(params).length !== 0) url = `${url}?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
-        let res = await axios.get(url, HEADERS);
-        return res.data;
-    } catch (e) {
-        throw new Error(e);
-    }
+    return apiCall(path, params, HEADERS);
 }
 
-// ===============================================================================================
+// ==========================================================================================
+// CATEGORY ENDPOINTS
+// ==========================================================================================
+// GET CATEGORIES - INDEX
+export async function getCategories(section, params) {
+    return await apiCall(`${API_URL}genre/${section}/list`, params, HEADERS);
+}
 
-// Get Data for a specific Category
+// GET CATEGORY DATA - READ
 export async function getByCategory(section, params) {
-    try {
-        let url = `${API_URL}${DISCOVER_ENDPOINT}${section}`
-        url = `${url}?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
-        let res = await axios.get(url, HEADERS);
-        return res.data;
-    } catch (e) {
-        throw new Error(e);
-    }
+    return await apiCall(`${API_URL}${DISCOVER_ENDPOINT}/${section}`, params, HEADERS);
 }
 
-// ===============================================================================================
-
-// GET DETAILS
-export async function getDetails(type, id, params) {
-    try {
-        let url = `${API_URL}${type}/${id}`
-        url = `${url}?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
-        let res = await axios.get(url, HEADERS);
-        return res.data;
-    } catch (e) {
-        throw new Error(e);
-    }
-}
-
-
-// ===============================================================================================
-// GET DETAILS
+// ==========================================================================================
+// EPISODES ENDPOINTS
+// ==========================================================================================
+// GET SEASON EPISODES
 export async function getSeasonEpisodes(series_id, season_number, params = {}) {
-    try {
-        let url = `${API_URL}tv/${series_id}/season/${season_number}`
-        url = `${url}?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
-        let res = await axios.get(url, HEADERS);
-        return res.data;
-    } catch (e) {
-        throw new Error(e);
-    }
+    return apiCall(`${API_URL}tv/${series_id}/season/${season_number}`, params, HEADERS);
 }
 
-// ===============================================================================================
-
-// SEARCH
-export async function searchByName(mediaType='movie', params) {
-    try {
-        let url = `${API_URL}${SEARCH_ENDPOINT}${mediaType}`
-        url = `${url}?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
-        let res = await axios.get(url, HEADERS);
-        return res.data;
-    } catch (e) {
-        throw new Error(e);
-    }
-}
-// ===============================================================================================
-//  HELPER FUNCTIONS
-// ===============================================================================================
-function createPanels(results, endpoints, callback) {
-    let panels = [];
-    results.map((result, idx) => {
-        let data = [];
-        let panel = endpoints[idx];
-        const { id, name, type, item_type, max, cta, url } = endpoints[idx];
-
-        const responseData = result.data;
-        data = responseData.genres || responseData.results || [];
-
-        // If it is ther first (Trending), use the first item a the Hero item and the rest fopr the carousel
-        if (idx === 1) {
-            panels.unshift({ id:0, type:"showcase", item_type:"showcase", data: data[0] })
-            data = data.slice(1)
-        }
-        panel['data'] = data;
-        panel['title'] = name;
-        panels.push(panel)
-        // panels.push({ id, title:name, type, item_type, data, max, cta, url })
-    });
-    callback({panels})
+// ==========================================================================================
+// SEARCH ENDPOINT
+// ==========================================================================================
+// SEARCH BY NAME
+export async function searchByName(mediaType='multi', params) {
+    return apiCall(`${API_URL}${SEARCH_ENDPOINT}${mediaType}`, params, HEADERS);
 }
