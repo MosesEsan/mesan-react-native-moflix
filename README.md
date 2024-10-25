@@ -1,79 +1,48 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# MoFlix
+MoFlix is a Netflix Semi-Clone an iOS mobile application built with React Native using The Movie Database (TMDB) API. 
 
-# Getting Started
+Users can view all Popular, Trending Movies and TV Shows, view by Categories and Search for a Movie or TV Show. 
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+React Native is a JavaScript-based mobile app framework for building natively-rendered mobile apps for iOS and Android.
 
-## Step 1: Start the Metro Server
+# Features
+- Dashboard - Panel Based dashboard displaying the Trending and Popular Movies & TV Shows.
+- Categories - View All Categories and View By Category
+- Favorites - Add movies or tv shows to your Favorites list.
+- Search - Search for a movie ot tv show.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+# API Used
+- [The Movie Database (TMDB) API](https://developer.themoviedb.org/docs/getting-started)
 
-To start Metro, run the following command from the _root_ of your React Native project:
+# Packages Used
+**Core**
+- [React Query](https://www.npmjs.com/package/react-native-helper-views) Powerful asynchronous state management, server-state utilities and data fetching for the web. TS/JS, React Query, Solid Query, Svelte Query and Vue Query.
+- [Axios](https://www.npmjs.com/package/axios) - Promise based HTTP client for the browser and node.js
 
-```bash
-# using npm
-npm start
+**Components**
+- [react-native-helper-views](https://www.npmjs.com/package/react-native-helper-views)
+- [mesan-react-native-panel](https://www.npmjs.com/package/mesan-react-native-panel) - A React Native Panel Component with various types (grid, showcase, carousel, carousel-decked, default)
+- [react-native-filter-component](https://www.npmjs.com/package/react-native-filter-component) - Filter Component for React Native
+- [React Native Youtube iframe](https://www.npmjs.com/package/react-native-youtube-iframe) - A simple wrapper around the youtube iframe js API for react native.
+- [React Native Orientation Locker](https://github.com/wonday/react-native-orientation-locker) - A react-native module that can listen on orientation changing of device, get current orientation, lock to preferred orientation. (cross-platform support)
+- [React Native Linear Gradient](https://www.npmjs.com/package/react-native-linear-gradient) - A LinearGradient element for React Native
 
-# OR using Yarn
-yarn start
-```
+**UI toolkit**
+Cross Platform
+- [@rneui/base](https://reactnativeelements.com/) - React Native UI toolkit for making cross platform applications
+- [@rneui/themed](https://reactnativeelements.com/) - React Native UI toolkit for making cross platform applications
+- [react-native-vector-icons](https://github.com/oblador/react-native-vector-icons) - Customizable vector icons
 
-## Step 2: Start your Application
+**Navigation - [React Navigation](https://reactnavigation.org/)** - Routing and navigation for React Native apps.
+- [@react-navigation/native](https://reactnavigation.org/docs/getting-started/) - React Native integration for React Navigation.
+- [@react-navigation/stack](https://reactnavigation.org/docs/hello-react-navigation#installing-the-native-stack-navigator-library) - Stack navigator
+- [@react-navigation/elements](https://reactnavigation.org/docs/elements/) - A component library containing the UI elements and helpers used in React Navigation. 
+- [Navigation Dependencies](https://reactnavigation.org/docs/getting-started/#installing-dependencies-into-a-bare-react-native-project)
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+**Other Navigation Dependencies**
+- react-native-reanimated 
+- react-native-gesture-handler 
+- @react-native-masked-view/masked-view
 
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+**Async Storage**
+- [React Native Async Storage](https://www.npmjs.com/package/@react-native-async-storage/async-storage) - An asynchronous, unencrypted, persistent, key-value storage system for React Native.
