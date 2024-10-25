@@ -8,7 +8,8 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import Panel from "mesan-react-native-panel";
 import { EmptyView, ErrorView, NavBackButton, NavButtons, CustomNavTitle, useCRUD } from "react-native-helper-views";
 
-// PROVIDERS
+// HOOKS
+import useFetch from '../hooks/useFetch';
 import { useModuleContext } from "../core/Provider";
 
 // SERVICES
@@ -24,45 +25,46 @@ import { colors } from "../core/Config"
 // import { styles } from "../styles";
 
 export default function Dashboard({}) {
-    // 0 - NAVIGATION PROVIDER
+    //1 - DECLARE VARIABLES
+    // NAVIGATION
     const navigation = useNavigation();
     const route = useRoute();
 
+    // HOOKS
     // Get the current section from the Context
     const { section } = useModuleContext();
+    
+    // LOADING STATE AND ERROR
+    const [
+        { data, error, page, nextPage, totalResults, isFetching, isRefreshing, isFetchingMore }, 
+        { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setIsFetchingMore, setAPIResponse }
+    ] = useFetch();
 
+    // ROUTE PARAMS
     // If the section was passed as a Route parameter
     // const section = route.params?.section;
-
-    //1 - DECLARE VARIABLES
-    const {
-        data, error,
-        isFetching, isRefreshing,
-        setLoading, resetLoadingState, setData, setError
-    } = useCRUD([])
 
     //========================================================================================
     //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
     // COMMENT OUT IF USING AS A NESTED SCREEN
     // OR LEAVE UNCOMMENTED IF USING AS A MAIN SCREEN OR WANT TO OVERRIDE THE NAVIGATION CONFIG
-    const navButtons = [
-        {
-            onPress: () => navigation.navigate('Search'),
-            name: "search",
-            type: "ionicon",
-            color: "#fff",
-            style: { paddingLeft: 5 }
-        },
-        {
-            onPress: () => navigation.navigate('Filter'),
-            name: "calendar-outline",
-            type: "ionicon",
-            color: "#fff",
-            style: { paddingLeft: 5 }
-        }
-    ];
-
     useLayoutEffect(() => {
+        const navButtons = [
+            {
+                onPress: () => navigation.navigate('Search'),
+                name: "search",
+                type: "ionicon",
+                color: "#fff",
+                style: { paddingLeft: 5 }
+            },
+            {
+                onPress: () => navigation.navigate('Filter'),
+                name: "calendar-outline",
+                type: "ionicon",
+                color: "#fff",
+                style: { paddingLeft: 5 }
+            }
+        ];
         navigation.setOptions({
             // headerTitle: section?.name || "Dashboard",
             // if using a a nested screen in the Home scene   
@@ -95,39 +97,27 @@ export default function Dashboard({}) {
         // If not refreshing, empty the data array - OPTIONAL
         if (!refresh) setData([])
 
-        setLoading(true, refresh);
+        if (!refresh) setIsFetching(true);
+        else setIsRefreshing(true)
 
         try {
             // pass the selected section to the params instead
             if (section) params = { ...params, 'section': section.id }
             let response = await getDashboard(params)
-            onCompleted(response);
-        } catch (error) {
-            alert(error.message)
-            onError(error);
+            setData(response);
+        }  catch (error) {
+            console.log(error)
+            setError(error.message);
+        } finally {
+            setIsFetching(false)
+            setIsRefreshing(false)
         }
     }
 
     //===========================================================================================
-    //3 - API RESPONSE HANDLERS
-    // ===========================================================================================
-    function onCompleted(data) {
-        setData(data);
-
-        //If not using Provider
-        setError(null);
-        resetLoadingState()
-    }
-
-    function onError(error) {
-        setError(error.message)
-        //If not using Provider
-        resetLoadingState()
-    }
-    //==============================================================================================
-    //4 -  UI ACTION HANDLERS
+    //3 - UI ACTION HANDLERS
     //==========================================================================================
-    //4a - RENDER PANEL ITEM
+    //3a - RENDER PANEL ITEM
     const renderPanelItem = ({ item, index, panel }) => {
         const { item_type } = panel;
 
@@ -135,7 +125,7 @@ export default function Dashboard({}) {
     };
     
     // ==========================================================================================
-    //5 -  ACTION HANDLERS
+    //4 -  ACTION HANDLERS
     //==========================================================================================
     function onPanelViewAllPress(panel) {
         //  check type of panel and transition to the appropriate screen
@@ -143,7 +133,7 @@ export default function Dashboard({}) {
     }
 
     // ==========================================================================================
-    // 6 - RENDER VIEW
+    // 5 - RENDER VIEW
     //==========================================================================================
     const dashboardProps = {
         isFetching, isRefreshing, error, data,
