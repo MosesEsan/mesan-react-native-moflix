@@ -8,6 +8,7 @@ import ListScreen from '../scenes/List';
 import DetailsScreen from '../scenes/Details';
 import MediaPlayer from '../scenes/MediaPlayer';
 import FavoritesScreen from '../scenes/Favorites';
+import SearchScreen from '../scenes/Search';
 
 // CONFIG
 import { colors } from './Config';
@@ -51,6 +52,10 @@ export const scenes = [
   {
       name: "MediaPlayer",
       component: MediaPlayer
+  },
+  {
+      name: "Search",
+      component: SearchScreen
   }
 ]
 

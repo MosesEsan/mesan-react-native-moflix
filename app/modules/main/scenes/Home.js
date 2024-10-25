@@ -10,11 +10,11 @@ import { useNavigation } from "@react-navigation/native";
 import { FilterView } from "react-native-filter-component";
 import { NavButtons, CustomNavTitle } from "react-native-helper-views";
 
-// SERVICES
-import { getSections } from "../core/Service";
-
 // HOOKS    
 import { useModuleContext } from "../core/Provider";
+
+// SERVICES
+import { getSections } from "../core/Service";
 
 // COMPONENTS
 import Dashboard from './Dashboard';
@@ -35,13 +35,13 @@ export default function Home() {
     //========================================================================================
     //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
     const navButtons = [
-        //     {
-        //     onPress: () => alert("Search coming soon...."),
-        //     name: "search",
-        //     type: "ionicon",
-        //     color: "#fff",
-        //     style: { paddingLeft: 5 }
-        // },
+            {
+            onPress: () => navigation.navigate('Search'),
+            name: "search",
+            type: "ionicon",
+            color: "#fff",
+            style: { paddingLeft: 5 }
+        },
         {
             onPress: () => navigation.navigate('Favorites'),
             name: "favorite",
@@ -77,36 +77,22 @@ export default function Home() {
 
         try {
             let response = await getSections();
-            onCompleted(response?.sections);
+            let sections = response?.sections;
+            setSections(sections);
+            setSection(sections[0])
         } catch (error) {
-            alert(error.message)
-            onError(error);
+            console.log(error)
+            setError(error.message);
+        } finally {
+            setIsFetching(false)
+            setIsRefreshing(false)
         }
     }
 
-    //===========================================================================================
-    //3 - API RESPONSE HANDLERS
-    //===========================================================================================
-    function onCompleted(data) {
-        // setData(data);
-        setSections(data);
-        setSection(data[0])
-
-        setError(null);
-        setIsFetching(false)
-        setIsRefreshing(false)
-    }
-
-    function onError(error) {
-        setError(error.message)
-        setIsFetching(false)
-        setIsRefreshing(false)
-    }
-
     //==============================================================================================
-    //4 -  UI ACTION HANDLERS
+    //3 -  UI ACTION HANDLERS
     //==============================================================================================
-    //4a - RENDER ITEM
+    //3a - RENDER ITEM
     const renderItem = ({ item, index }) => {
         return (
             <Pressable onPress={() => onSectionSelected(item)} key={`menuitem_{${idx}}`}>
@@ -122,7 +108,7 @@ export default function Home() {
         )
     }
 
-    //4a - RENDER SCROLLVIEW VIEW CONTENT
+    //3b - RENDER SCROLLVIEW VIEW CONTENT
     const renderScrollViewContent = () => {
         if (isFetching) return <ActivityIndicator style={[{ flex: 1 }]} />;
 
@@ -136,7 +122,7 @@ export default function Home() {
     }
     
     // ==========================================================================================
-    //5 -  ACTION HANDLERS
+    //4 -  ACTION HANDLERS
     //==========================================================================================
     async function onSectionSelected(selected) {
         setSection(selected);
@@ -146,7 +132,7 @@ export default function Home() {
     };
 
     // ==========================================================================================
-    // 6 - RENDER VIEW
+    // 5 - RENDER VIEW
     //==========================================================================================
     const filterViewProps = {
         data: sections,
