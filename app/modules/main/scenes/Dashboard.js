@@ -1,13 +1,13 @@
-import React, { useEffect, useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo } from 'react';
 import { SafeAreaView, ActivityIndicator, ScrollView, RefreshControl, StyleSheet } from 'react-native';
 
 // NAVIGATION
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
-import Panel from "mesan-react-native-panel";
 import { FilterView } from "react-native-filter-component";
-import { EmptyView, ErrorView, NavButtons, CustomNavTitle } from "react-native-helper-views";
+import { PanelContainer } from "mesan-react-native-panel";
+import { ErrorView, NavButtons, CustomNavTitle } from "react-native-helper-views";
 
 // HOOKS
 import useFetch from '../hooks/useFetch';
@@ -38,8 +38,8 @@ export default function Dashboard({ }) {
     const [
         //page, nextPage, totalResults, isFetchingNextPage
         { data, error, isFetching, isRefreshing },
-        //  setPage, setNextPage, setTotalResults, setIsFetchingNextPage, setAPIResponse
-        { setData, setError, setIsFetching, setIsRefreshing, setLoadingState }
+        //  setPage, setNextPage, setTotalResults, setIsRefreshing, setIsFetchingNextPage, setAPIResponse
+        { setData, setError, setIsFetching, setLoadingState }
     ] = useFetch();
 
     // ROUTE PARAMS
@@ -168,39 +168,33 @@ export default function Dashboard({ }) {
         navigation.navigate('List', { panel });
     }
 
-    // ==========================================================================================
-    // 5 - RENDER VIEW
-    //==========================================================================================
-    // FILTER VIEW PROPS
+    // ========================================================================================
+    // 5 - VIEW PROPS
+    //=========================================================================================
+    //5a - PANEL DATA
+    const panels = useMemo(() => {
+        const sharedPanelProps = {
+            containerStyle: { marginBottom: 15 },
+            headerStyle: { color: colors.text, fontWeight: "500" },
+            ctaTextStyle: { color: colors.text },
+            onPress: onPanelViewAllPress,
+            renderItem: renderPanelItem
+
+        }
+        return data.map(panel => ({ ...panel, ...sharedPanelProps }));
+    }, [data]);
+
+
+    //5b - FILTER VIEW PROPS
     const filterViewProps = {
         data: sections,
-        // misc: section ? [section] : [],
         initialIndex: 0,
         onItemPress: onSectionSelected,
         ...filterViewStyles,
     }
 
-    // PANEL CONTAINER PROPS
-    const panelProps = {
-        data,
-        isRefreshing,
-        onRefresh: () => getData(true),
-        onPress: onPanelViewAllPress,
-        renderItem: renderPanelItem
-    }
-
-    return (
-        <SafeAreaView style={[{ flex: 1, backgroundColor: colors.primary }]}>
-            {/* If using the the filter view */}
-            <FilterView {...filterViewProps} />
-            {(isFetching) ? renderLoading() : (error) ? renderError() : (<PanelContainer {...panelProps}/>)}
-        </SafeAreaView>
-    );
-};
-
-// PANEL CONTAINER
-const PanelContainer = ({ isRefreshing, onRefresh, data, onPress, renderItem }) => {
-    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+    //5c - SCROLLVIEW PROPS
+    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={() => getData(true)} />
     const scrollViewProps = {
         horizontal: false,
         showsHorizontalScrollIndicator: false,
@@ -208,28 +202,21 @@ const PanelContainer = ({ isRefreshing, onRefresh, data, onPress, renderItem }) 
         contentContainerStyle: { flexGrow: 1 },
     }
 
+    // ========================================================================================
+    // 6 - RENDER VIEW
+    //=========================================================================================
     return (
-        <ScrollView {...scrollViewProps}>
-        {
-            data.map((panel, index) => {
-                return (
-                    <Panel
-                        key={`panel_${index}`}
-                        {...panel}
-                        type={panel.type}
-                        containerStyle={{ marginBottom: 15 }}
-                        ctaContainerStyle={{}}
-                        ctaTextStyle={{ color: colors.text }}
-                        headerStyle={{ color: colors.text, fontWeight: "500" }}
-                        onPress={panel.cta ? () => onPress(panel) : null}
-                        renderItem={({ item, index }) => renderItem({ item, index, panel })}
-                    />
-                )
-            })
-        }
-    </ScrollView>
-    )
-}
+        <SafeAreaView style={[{ flex: 1, backgroundColor: colors.primary }]}>
+            {/* If using the the filter view */}
+            <FilterView {...filterViewProps} />
+            {(isFetching) ? renderLoading() : (error) ? renderError() : (
+                <ScrollView {...scrollViewProps}>
+                    <PanelContainer data={panels} />
+                </ScrollView>
+            )}
+        </SafeAreaView>
+    );
+};
 
 const filterViewStyles = StyleSheet.create({
     headerStyle: { color: "white" },
