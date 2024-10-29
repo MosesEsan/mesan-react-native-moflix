@@ -5,7 +5,7 @@ import { View, SafeAreaView, RefreshControl, ActivityIndicator, ScrollView } fro
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
-import Panel, { PanelContainer } from '../components/PanelContainer';
+import Panel, { PanelContainer } from 'mesan-react-native-panel';  
 import { ErrorView, NavBackButton, NavButtons } from "react-native-helper-views";
 
 // HOOKS
