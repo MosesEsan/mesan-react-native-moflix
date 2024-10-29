@@ -15,6 +15,8 @@
 		7699B88040F8A987B510C191 /* libPods-MoFlix-MoFlixTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-MoFlix-MoFlixTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		BDAED7B72D19EF4BC260318F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 01BDA2679F1DBF8466C3A1C2 /* PrivacyInfo.xcprivacy */; };
+		208868401C384A5BB83C6E03 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 125B13622C614205A7D80CB7 /* BootSplash.storyboard */; };
+		C9C4490C6D724D299353542F /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8F7247449CC049F1947D45E4 /* Colors.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +49,8 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = MoFlix/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-MoFlix-MoFlixTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MoFlix-MoFlixTests.release.xcconfig"; path = "Target Support Files/Pods-MoFlix-MoFlixTests/Pods-MoFlix-MoFlixTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		125B13622C614205A7D80CB7 /* BootSplash.storyboard */ = {isa = PBXFileReference; name = "BootSplash.storyboard"; path = "MoFlix/BootSplash.storyboard"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		8F7247449CC049F1947D45E4 /* Colors.xcassets */ = {isa = PBXFileReference; name = "Colors.xcassets"; path = "MoFlix/Colors.xcassets"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = folder.assetcatalog; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +101,8 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				01BDA2679F1DBF8466C3A1C2 /* PrivacyInfo.xcprivacy */,
+				125B13622C614205A7D80CB7 /* BootSplash.storyboard */,
+				8F7247449CC049F1947D45E4 /* Colors.xcassets */,
 			);
 			name = MoFlix;
 			sourceTree = "<group>";
@@ -249,6 +255,8 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				BDAED7B72D19EF4BC260318F /* PrivacyInfo.xcprivacy in Resources */,
+				208868401C384A5BB83C6E03 /* BootSplash.storyboard in Resources */,
+				C9C4490C6D724D299353542F /* Colors.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
