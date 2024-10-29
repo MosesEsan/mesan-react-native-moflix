@@ -6,16 +6,32 @@ export default function useFetch(initialData: any[]) {
     // LOADING STATES
     const [isFetching, setIsFetching] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
 
     // DATA STATES
-    const [data, setData] = useState(initialData || []);
+    const [data, _setData] = useState(initialData || []);
     const [page, setPage] = useState(1);
     const [nextPage, setNextPage] = useState(null);
     const [totalResults, setTotalResults] = useState(null);
 
     // ERROR STATES
     const [error, setError] = useState(null);
+    
+    // SET LOADING STATES
+    const setLoadingState = (fetching=false, refreshing=false, fetchingMore=false) => {
+        // If fetching and not refreshing or getting more, empty the data array
+        if (fetching) _setData([])
+
+        setIsFetching(fetching);
+        setIsRefreshing(refreshing);
+        setIsFetchingNextPage(fetchingMore);
+    };
+
+    // SET DATA STATE
+    const setData = (data: any[]) => {
+        _setData(data);
+        setError(null);
+    }
 
     // API REQUEST FUNCTION
     const makeAPIRequest = async (url: string, params: { [x: string]: any; }, headers={}) => {
@@ -40,7 +56,7 @@ export default function useFetch(initialData: any[]) {
     }
 
     return [
-        { data, error, page, nextPage, totalResults, isFetching, isRefreshing, isFetchingMore, setIsFetchingMore }, 
-        { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setIsFetchingMore, setAPIResponse }
+        { data, error, page, nextPage, totalResults, isFetching, isRefreshing, isFetchingNextPage }, 
+        { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setIsFetchingNextPage, setAPIResponse, setLoadingState }
     ]
 }
