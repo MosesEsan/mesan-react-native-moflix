@@ -8,6 +8,7 @@ import DetailsScreen from '../scenes/Details';
 import MediaPlayer from '../scenes/MediaPlayer';
 import FavoritesScreen from '../scenes/Favorites';
 import SearchScreen from '../scenes/Search';
+import CreditsScreen from '../scenes/Credits';
 
 // CONFIG
 import { colors } from './Config';
@@ -33,6 +34,10 @@ export const scenes = [
   {
     name: "MediaPlayer",
     component: MediaPlayer
+  },
+  {
+    name: "Credits",
+    component: CreditsScreen
   }
 ]
 
