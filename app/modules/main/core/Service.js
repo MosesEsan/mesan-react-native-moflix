@@ -107,6 +107,14 @@ export async function getSeasonEpisodes(series_id, season_number, params = {}) {
 }
 
 // ==========================================================================================
+// CREDITS
+// ==========================================================================================
+// GET MEDIA CREDITS
+export async function getCredits(section, id, params = {}) {
+    return apiCall(`${API_URL}${section}/${id}/credits`, params, HEADERS);
+}
+
+// ==========================================================================================
 // SEARCH ENDPOINT
 // ==========================================================================================
 // SEARCH BY NAME
