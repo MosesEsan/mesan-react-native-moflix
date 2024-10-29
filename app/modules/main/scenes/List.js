@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useMemo } from 'react';
+import React, { useLayoutEffect, useMemo } from 'react';
 import { SafeAreaView, FlatList, ActivityIndicator } from 'react-native';
 
 // NAVIGATION
@@ -87,14 +87,6 @@ export default function List(props) {
     //==========================================================================================
     // 2 - MAIN CODE BEGINS HERE
     // ==========================================================================================
-    // TODO: Test the passedData
-    // useEffect(() => {
-    //     (async () => {
-    //         if (passedData) await setData(passedData)
-    //         else await getData()
-    //     })();
-    // }, [])
-
     //2b - GET DATA
     async function getData({ pageParam }) {
         if (category) return await getWithCategory(pageParam);
@@ -180,8 +172,9 @@ export default function List(props) {
     }, [data])
 
     // ==========================================================================================
-    // 6 - RENDER VIEW
+    // 5 - VIEW PROPS
     //==========================================================================================
+    //5a - FLATLIST PROPS
     const listProps = {
         // data: data.pages.map(page => page.results).flat(),
         // extraData: data.pages.map(page => page.results).flat(),
@@ -204,6 +197,9 @@ export default function List(props) {
         ListFooterComponent: renderFooter
     }
 
+    // ==========================================================================================
+    // 6 - RENDER VIEW
+    //==========================================================================================
     if (isFetching && !isFetchingNextPage) return renderLoading();
     if (error) return renderError();
     return (

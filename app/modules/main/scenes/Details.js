@@ -5,7 +5,7 @@ import { View, SafeAreaView, RefreshControl, ActivityIndicator, ScrollView } fro
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
-import Panel from "mesan-react-native-panel";
+import Panel, { PanelContainer } from '../components/PanelContainer';
 import { ErrorView, NavBackButton, NavButtons } from "react-native-helper-views";
 
 // HOOKS
@@ -23,14 +23,12 @@ import useTMDB from '../hooks/useTMDB';
 
 // CONFIG
 import { colors } from "../core/Config"
-import PanelContainer from '../components/PanelContainer';
 
 // STYLES
 // import { styles } from "../../../styles";
 
 export default function Details(props) {
     // 1 - DECLARE VARIABLES
-
     // NAVIGATION HOOKS
     const navigation = useNavigation();
 
@@ -49,8 +47,6 @@ export default function Details(props) {
         { setData, setError, setIsFetching, setIsRefreshing, setLoadingState }
     ] = useFetch();
 
-
-    const { videos, seasons, cast } = useTMDB(data);
     const [panels, setPanels] = useState([])
 
     //==================================================================================================

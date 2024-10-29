@@ -184,12 +184,16 @@ export default function Dashboard({ }) {
         return data.map(panel => ({ ...panel, ...sharedPanelProps }));
     }, [data]);
 
-
     //5b - FILTER VIEW PROPS
     const filterViewProps = {
         data: sections,
         initialIndex: 0,
         onItemPress: onSectionSelected,
+        containerStyle: { backgroundColor: "transparent" },
+        headerStyle: { color: colors.text },
+        ctaStyle: { color: colors.text },
+        selectedStyle: { backgroundColor: colors.secondary },
+        selectedTextStyle: { color: colors.text },
         ...filterViewStyles,
     }
 
@@ -219,10 +223,6 @@ export default function Dashboard({ }) {
 };
 
 const filterViewStyles = StyleSheet.create({
-    headerStyle: { color: "white" },
-    containerStyle: {
-        backgroundColor: "transparent",
-    },
     itemContainerStyle: {
         backgroundColor: "transparent",
         borderWidth: 0,
@@ -234,11 +234,5 @@ const filterViewStyles = StyleSheet.create({
         color: "white",
         fontWeight: "500"
     },
-    selectedStyle: {
-        backgroundColor: "rgb(45, 45, 45)"
-    },
-    selectedTitleStyle: {
-        color: "#fff",
-    },
-    ctaStyle: { color: "#fff" },
+
 });

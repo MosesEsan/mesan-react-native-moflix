@@ -18,7 +18,7 @@ export default function AppRoute() {
   useEffect(() => {
     setTimeout(async () => {
       await BootSplash.hide({ fade: true });
-    }, 5000)
+    }, 3000)
   },);
 
   return (
