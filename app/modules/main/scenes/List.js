@@ -22,7 +22,7 @@ import DetailItem from '../components/DetailItem';
 import { colors } from '../core/Config';
 
 // NUM OF COLUMNS
-const FLATLIST_COLUMNS = 2;
+const FLATLIST_COLUMNS = 3;
 
 // STYLES
 // import { styles } from "../styles";
@@ -31,7 +31,6 @@ export default function List(props) {
     // 1 - DECLARE VARIABLES
     // NAVIGATION
     const navigation = useNavigation();
-    const route = useRoute();
 
     // HOOKS
     // if using Panels and/or Sections
@@ -40,6 +39,7 @@ export default function List(props) {
 
     // ROUTE PARAMS
     //Access the PARAMS data using:
+    const route = useRoute();
     // if displaying the data for a specific panel
     const panel = route.params?.panel;
 
@@ -47,30 +47,22 @@ export default function List(props) {
     const category = route.params?.category;
 
     // if an array of data is passed as a prop
-    const passedData = route.params?.data;
+    const item = route.params?.item;
 
     // The scene is used as the ModuleItem type
     const scene = route.params?.type;
 
     // the flatlist defults to 2 columns, to change this, a props can be pased
-    const columns = route.params?.columns || props.columns || FLATLIST_COLUMNS;
+    const columns = (panel && panel?.item_type === "category") ? 2  : route.params?.columns || FLATLIST_COLUMNS;
 
+    // LOADING STATE AND ERROR
     const {
-        data,
-        error,
-        fetchNextPage,
-        hasNextPage,
-        isPending,
-        isFetching,
-        isFetchingNextPage,
-        status,
+        data, error, // status
+        isFetching, isFetchingNextPage, //isPending
+        hasNextPage, fetchNextPage,
     } = useInfiniteQuery({
-        queryKey: ['list-data', section, category, panel],
-        queryFn: async ({ pageParam }) => {
-            if (category) return await getWithCategory(pageParam);
-            else if (scene === "episodes") return await getEpisodes()
-            else return getPanelData(pageParam, panel)
-        },
+        queryKey: ['list-data', section, category, panel, scene],
+        queryFn: getData,
         initialPageParam: 1,
         getNextPageParam: (lastPage, allPages, lastPageParam) => {
             // only attempt to fetch the next page if we viewing a category and the last page has less than the total pages
@@ -103,13 +95,14 @@ export default function List(props) {
     //     })();
     // }, [])
 
-    // 2c - GET PANEL DATA
-    async function getPanelData(page, panel) {
-        //panel?.id;
-        return await getPanel(panel?.url, { page });
+    //2b - GET DATA
+    async function getData({ pageParam }) {
+        if (category) return await getWithCategory(pageParam);
+        else if (scene === "episodes") return await getEpisodes(); 
+        else return await getPanel(panel?.url, { page:pageParam });
     }
 
-    // 2d - GET DATA BY CATEGORY
+    // 2c - GET DATA BY CATEGORY
     async function getWithCategory(page) {
         let params = {
             "primary_release_date.lte": "31-12-2024",
@@ -119,7 +112,7 @@ export default function List(props) {
         return await getByCategory(section.slug, params)
     }
 
-    // 2e - GET EPISODES
+    // 2d - GET EPISODES
     async function getEpisodes() {
         const series_id = route.params?.series_id;
         const season_number = route.params?.season_number;
@@ -131,45 +124,46 @@ export default function List(props) {
     }
 
     //==============================================================================================
-    //4 -  UI ACTION HANDLERS
+    //3 -  UI ACTION HANDLERS
     //==============================================================================================
-    //4a - RENDER ITEM
+    //3a - RENDER ITEM
     const renderItem = ({ item, index }) => {
         // if displaying the data for a specific panel and the panel media_type is "category"
         // render the GridCategoryItem
-        if (panel && panel?.media_type === "category") return <ModuleItem type={'category-grid'} item={item} />
+        // alert(JSON.stringify(JSON.stringify(panel)))
+        if (panel && panel?.item_type === "category") return <ModuleItem type={'category-grid'} item={item} />
 
         if (scene) return <DetailItem type={scene} item={item} />
-
+        
         return <ModuleItem type={'media-grid'} item={item} size={"medium"} />
     }
 
-    //4b - RENDER EMPTY
+    //3b - RENDER EMPTY
     const renderEmpty = () => {
         let props = { color: colors.text }
         let textProps = { titleStyle: props, textStyle: props }
         return <EmptyView title={"No Data."} message={"No data to show"} {...textProps} />
     };
 
-    //4c - RENDER FOOTER
+    //3c - RENDER FOOTER
     const renderFooter = () => {
         return hasNextPage && isFetchingNextPage ? (
             <ActivityIndicator size="small" color={colors.text} style={{ height: 50 }} />
         ) : null;
     };
 
-    // 4d - RENDER ERROR
+    // 3d - RENDER ERROR
     const renderError = () => {
         return <ErrorView message={error} onPress={() => getData(false)} />
     }
 
-    // 4e - RENDER LOADING
+    // 3e - RENDER LOADING
     const renderLoading = () => {
         return <ActivityIndicator style={{ backgroundColor: colors.primary, flex: 1 }} />
     }
 
     // ==========================================================================================
-    //5 -  ACTION HANDLERS
+    //4 -  ACTION HANDLERS
     //==========================================================================================
     // If using Infinite Scroll - Load More Data
     let onEndReached = () => !isFetching && fetchNextPage()
@@ -180,6 +174,7 @@ export default function List(props) {
             // if the key is episodes, use it else return the data
             if (page?.results) return page.results;
             if (page?.episodes) return page.episodes;
+            if (page?.genres) return page.genres;
             return []
         }).flat()
     }, [data])
@@ -191,7 +186,7 @@ export default function List(props) {
         // data: data.pages.map(page => page.results).flat(),
         // extraData: data.pages.map(page => page.results).flat(),
         initialNumToRender: 10,
-        numColumns: columns || FLATLIST_COLUMNS,
+        numColumns: columns,
 
         style: { backgroundColor: colors.primary },
         contentContainerStyle: { flexGrow: 1 },
@@ -209,8 +204,8 @@ export default function List(props) {
         ListFooterComponent: renderFooter
     }
 
-    if (isFetching && !isFetchingNextPage) renderLoading();
-    if (error) renderError();
+    if (isFetching && !isFetchingNextPage) return renderLoading();
+    if (error) return renderError();
     return (
         <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
             {/* //If using Flatlist */}
