@@ -1,3 +1,5 @@
+import moment from "moment";
+
 const useTMDB = (item) => {
     const {
         spoken_languages = [],
@@ -33,6 +35,10 @@ const useTMDB = (item) => {
     const videos = item?.videos?.results?.filter(video => video.site === 'YouTube') || [];
     const cast = item?.credits?.cast || [];
 
+    let date = `${release_date || first_air_date}`;
+    date = new Date(date);
+    date = moment(date).format("MMM Do YYYY");
+
     // loop throught he season add add the series_id
     seasons.map(season => season.series_id = item.id)
     return { 
@@ -45,7 +51,8 @@ const useTMDB = (item) => {
         poster_path,
         videos, cast,
         release_date,
-        first_air_date
+        first_air_date,
+        date
     }
 }
 
