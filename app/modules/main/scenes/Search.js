@@ -33,8 +33,8 @@ export default function SceneName(props) {
     const [cancelToken, setCancelToken] = useState('');
 
     const [
-        { data, error, page, nextPage, totalResults, isFetching, isRefreshing, isFetchingMore }, 
-        { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setIsFetchingMore, setAPIResponse }
+        { data, error, page, nextPage, totalResults, isFetching, isRefreshing, isFetchingNextPage },
+        { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setIsFetchingNextPage, setAPIResponse }
     ] = useFetch();
 
     //==================================================================================================
@@ -76,15 +76,15 @@ export default function SceneName(props) {
             if (!axios.isCancel(error)) setError(error.message);
         } finally {
             setIsFetching(false)
-            setIsFetchingMore(false)
+            setIsFetchingNextPage(false)
         }
     }
 
     // 2c - FETCH NEXT PAGE
     function fetchNextPage() {
         if (nextPage) {
-            setIsFetchingMore(true);
-            search(searchValue, nextPage, more=true);
+            setIsFetchingNextPage(true);
+            search(searchValue, nextPage, more = true);
         }
     }
 
@@ -105,7 +105,7 @@ export default function SceneName(props) {
 
     //3c - RENDER FOOTER
     const renderFooter = () => {
-        return isFetchingMore ? (
+        return isFetchingNextPage ? (
             <ActivityIndicator size="small" color={colors.text} style={{ height: 50 }} />
         ) : null;
     };
@@ -131,7 +131,12 @@ export default function SceneName(props) {
     //4 -  ACTION HANDLERS
     //==========================================================================================
     // If using Infinite Scroll - Load More Data
-    let onEndReached = () => (!isFetching && !isFetchingMore && nextPage) && fetchNextPage()
+    const onEndReached = () => (!isFetching && !isFetchingNextPage && nextPage) && fetchNextPage()
+
+    // ON CLOSE
+    const onClose = () => {
+        navigation.goBack();
+    }
 
     // ==========================================================================================
     //==========================================================================================
@@ -157,23 +162,34 @@ export default function SceneName(props) {
 
     return (
         <SafeAreaView style={[styles.container]}>
-            <SearchBar
-                value={searchValue} 
-                placeholder="Type Here..." 
-                onChangeText={setSearchValue}
-                placeholderTextColor={"#fff"}
-                inputStyle={styles.inputStyle}
-                containerStyle={styles.containerStyle}
-                inputContainerStyle={styles.inputContainerStyle} 
-                showCancel={true}
-                autoFocus={false} />
+            <SearchBarContainer searchValue={searchValue} onChangeText={setSearchValue} onClose={onClose} />
             {/* //If using Flatlist */}
-            {(isFetching && !isFetchingMore) && renderLoading()}
+            {(isFetching && !isFetchingNextPage) && renderLoading()}
             {(error) && renderError()}
             {(!isFetching && !error) && <FlatList {...listProps} />}
         </SafeAreaView>
     );
 };
+
+const SearchBarContainer = ({ searchValue, onChangeText, onClose }) => {
+    return (
+        <View style={{ flexDirection: "row" }}>
+            <SearchBar
+                value={searchValue}
+                placeholder="Type Here..."
+                onChangeText={onChangeText}
+                placeholderTextColor={"#fff"}
+                inputStyle={styles.inputStyle}
+                containerStyle={styles.containerStyle}
+                inputContainerStyle={styles.inputContainerStyle}
+                showCancel={true}
+                autoFocus={false} />
+            <Pressable onPress={onClose} style={styles.cancelButton}>
+                <Text style={styles.cancelText}>Cancel</Text>
+            </Pressable>
+        </View>
+    );
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -182,20 +198,32 @@ const styles = StyleSheet.create({
     },
 
     containerStyle: {
+        flex: 1,
         backgroundColor: "#000",
-        padding: 12
+        paddingVertical: 6, 
     },
 
     inputContainerStyle: {
-        height: 44, 
+        height: 34,
         borderRadius: 10,
         backgroundColor: "rgb(28,28,31)"
     },
 
     inputStyle: {
         color: "#fff",
+        minHeight: 34,
+        fontSize: 16,
+    },
+
+    cancelButton: {
+        width: 60,
+        justifyContent: "center",
+        alignItems: "center",
+        marginRight: 8
+    },
+
+    cancelText: {
+        color: "#fff",
+        fontWeight: "6i00"
     }
 });
-
-
-

@@ -2,7 +2,6 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // SCENES
-import HomeScreen from '../scenes/Home';
 import DashboardScreen from '../scenes/Dashboard';
 import ListScreen from '../scenes/List';
 import DetailsScreen from '../scenes/Details';
@@ -13,29 +12,11 @@ import SearchScreen from '../scenes/Search';
 // CONFIG
 import { colors } from './Config';
 
-const Stack = createStackNavigator();
-
-const headerStyle = {
-  borderBottomWidth: 0,
-  shadowColor: 'transparent',
-  backgroundColor: colors.primary,
-}
-
-const headerTitleStyle = {
-  color: colors.text
-}
-
-const headerTintColor = '#fff';
-
 // 1 - SCENES
 export const scenes = [
   {
-      name: "Home",
-      component: HomeScreen
-  },
-  {
-      name: "Dashboard",
-      component: DashboardScreen
+    name: "Dashboard",
+    component: DashboardScreen
   },
   {
     name: "List",
@@ -46,23 +27,36 @@ export const scenes = [
     component: DetailsScreen
   },
   {
-      name: "Favorites",
-      component: FavoritesScreen
+    name: "Favorites",
+    component: FavoritesScreen
   },
   {
-      name: "MediaPlayer",
-      component: MediaPlayer
-  },
-  {
-      name: "Search",
-      component: SearchScreen
+    name: "MediaPlayer",
+    component: MediaPlayer
   }
 ]
 
+// 2 - NAVIGATION PROPS
+const navigatorProps = {
+  initialRouteName: "Home",
+  screenOptions: {
+    headerStyle: {
+      borderBottomWidth: 0,
+      shadowColor: 'transparent',
+      backgroundColor: colors.primary,
+    },
+    headerTitleStyle: {
+      color: colors.text
+    },
+    headerTintColor: '#fff'
+  },
+}
+
 // 2 - STACK NAVIGATOR
-export default function ModuleStack() {
+const Stack = createStackNavigator();
+function MainStackScreen() {
   return (
-    <Stack.Navigator initialRouteName="Home" screenOptions={{headerStyle, headerTitleStyle, headerTintColor}}>
+    <Stack.Navigator {...navigatorProps} initialRouteName={scenes[0].name}>
       {
         scenes.map((scene, index) => {
           return (
@@ -75,6 +69,15 @@ export default function ModuleStack() {
           )
         })
       }
+    </Stack.Navigator>
+  );
+}
+
+export default function ModuleStack() {
+  return (
+    <Stack.Navigator {...navigatorProps} initialRouteName={"Main"} mode="modal">
+      <Stack.Screen name="Main" component={MainStackScreen} options={{ headerShown: false }} />
+      <Stack.Screen name={"Search"} component={SearchScreen} options={{ title: "Search", headerShown: false }} />
     </Stack.Navigator>
   );
 }

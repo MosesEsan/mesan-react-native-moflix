@@ -6,14 +6,15 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
 import Panel from "mesan-react-native-panel";
-import { EmptyView, ErrorView, NavBackButton, NavButtons, CustomNavTitle, useCRUD } from "react-native-helper-views";
+import { FilterView } from "react-native-filter-component";
+import { EmptyView, ErrorView, NavButtons, CustomNavTitle } from "react-native-helper-views";
 
 // HOOKS
 import useFetch from '../hooks/useFetch';
 import { useModuleContext } from "../core/Provider";
 
 // SERVICES
-import { getDashboard } from "../core/Service";
+import { getSections, getDashboard } from "../core/Service";
 
 // COMPONENTS
 import ModuleItem from "../components/ModuleItem";
@@ -24,24 +25,26 @@ import { colors } from "../core/Config"
 // STYLES
 // import { styles } from "../styles";
 
-export default function Dashboard({}) {
+export default function Dashboard({ }) {
     //1 - DECLARE VARIABLES
     // NAVIGATION
     const navigation = useNavigation();
-    const route = useRoute();
 
     // HOOKS
     // Get the current section from the Context
-    const { section } = useModuleContext();
-    
+    const { section, setSection, sections, setSections } = useModuleContext();
+
     // LOADING STATE AND ERROR
     const [
-        { data, error, page, nextPage, totalResults, isFetching, isRefreshing, isFetchingMore }, 
-        { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setIsFetchingMore, setAPIResponse }
+        //page, nextPage, totalResults, isFetchingNextPage
+        { data, error, isFetching, isRefreshing },
+        //  setPage, setNextPage, setTotalResults, setIsFetchingNextPage, setAPIResponse
+        { setData, setError, setIsFetching, setIsRefreshing, setLoadingState }
     ] = useFetch();
 
     // ROUTE PARAMS
     // If the section was passed as a Route parameter
+    // const route = useRoute();
     // const section = route.params?.section;
 
     //========================================================================================
@@ -58,22 +61,25 @@ export default function Dashboard({}) {
                 style: { paddingLeft: 5 }
             },
             {
-                onPress: () => navigation.navigate('Filter'),
-                name: "calendar-outline",
-                type: "ionicon",
+                onPress: () => navigation.navigate('Favorites'),
+                name: "favorite",
+                type: "fontisto",
                 color: "#fff",
+                size: 20,
                 style: { paddingLeft: 5 }
             }
         ];
         navigation.setOptions({
             // headerTitle: section?.name || "Dashboard",
+            headerTitle: "",
             // if using a a nested screen in the Home scene   
             // headerLeft: () => <NavBackButton onPress={() => navigation.goBack()} />,
             // headerRight: () => <NavButtons buttons={navButtons} />,
 
             // if not using a a nested screen in the Home scene
             // or using this component as standalone screen or overriding the navigation config
-            headerLeft: () => <CustomNavTitle title={"MoFlix"} style={{width: 200}} titleStyle={{color: colors.text}}/>,
+            headerLeft: () => <CustomNavTitle title={"MoFlix"} style={{ width: 200, paddingLeft: 14 }} titleStyle={{ color: colors.text, fontSize: 21 }} />,
+            headerRight: () => <NavButtons buttons={navButtons} />,
         });
     }, [navigation]);
 
@@ -81,36 +87,52 @@ export default function Dashboard({}) {
     // 2 - MAIN CODE BEGINS HERE
     // ==========================================================================================
     useEffect(() => {
-        (async () => await getData())();
-        //    }, []);
-        // If using as a nested screen in the Home scene, listen for changes in the selected section
+        //if (isLoggedIn) await getData()
+        (async () => await getDashbordSections())();
+    }, []); //}, [isLoggedIn])
+
+    useEffect(() => {
+        (async () => {
+            if (section) await getData(false, { 'section': section.id });
+        })();
     }, [section]);
 
-    // useEffect(() => {
-    //     (async () => {
-    //         if (isLoggedIn) await getData()
-    //     })();
-    // }, [isLoggedIn])
-
-    //2b - GET DATA
-    async function getData(refresh = false, params = {}) {
-        // If not refreshing, empty the data array - OPTIONAL
-        if (!refresh) setData([])
-
-        if (!refresh) setIsFetching(true);
-        else setIsRefreshing(true)
-
+    //2b - GET SECTIONS - OPTIONAL
+    async function getDashbordSections() {
         try {
-            // pass the selected section to the params instead
-            if (section) params = { ...params, 'section': section.id }
-            let response = await getDashboard(params)
-            setData(response);
-        }  catch (error) {
-            console.log(error)
+            // set the loading state
+            setIsFetching(true);
+
+            // get the sections
+            let response = await getSections();
+            let sections = response?.sections;
+
+            // set the sections and the first section as the selected section
+            setSections(sections);
+            setSection(sections[0])
+        } catch (error) {
             setError(error.message);
         } finally {
-            setIsFetching(false)
-            setIsRefreshing(false)
+            setLoadingState(false, false);
+        }
+    }
+
+    // 2c - GET DATA
+    async function getData(refresh = false, params = {}) {
+        try {
+            // set the loading state
+            setLoadingState(!refresh, refresh);
+
+            // pass the selected section to the params instead
+            // if (section) params = { ...params, 'section': section.id }
+            let response = await getDashboard(params)
+
+            // set the data
+            setData(response);
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoadingState(false, false);
         }
     }
 
@@ -119,76 +141,117 @@ export default function Dashboard({}) {
     //==========================================================================================
     //3a - RENDER PANEL ITEM
     const renderPanelItem = ({ item, index, panel }) => {
-        const { item_type } = panel;
-
-        return <ModuleItem type={item_type} item={item}/>
+        return <ModuleItem type={panel?.item_type} item={item} />
     };
-    
+
+    // 3d - RENDER ERROR
+    const renderError = () => {
+        return <ErrorView message={error} onPress={() => getData(false)} />
+    }
+
+    // 3e - RENDER LOADING
+    const renderLoading = () => {
+        return <ActivityIndicator style={{ backgroundColor: colors.primary, flex: 1 }} />
+    }
+
     // ==========================================================================================
     //4 -  ACTION HANDLERS
     //==========================================================================================
+    // 4a - ON SECTION SELECTED
+    async function onSectionSelected(selected) {
+        setSection(selected);
+    };
+
+    // 4B - ON PANEL VIEW ALL PRESS
     function onPanelViewAllPress(panel) {
         //  check type of panel and transition to the appropriate screen
-        navigation.navigate('List', { panel: panel });
+        navigation.navigate('List', { panel });
     }
 
     // ==========================================================================================
     // 5 - RENDER VIEW
     //==========================================================================================
-    const dashboardProps = {
-        isFetching, isRefreshing, error, data,
-        onRefresh: () => getData(true),
+    // FILTER VIEW PROPS
+    const filterViewProps = {
+        data: sections,
+        // misc: section ? [section] : [],
+        initialIndex: 0,
+        onItemPress: onSectionSelected,
+        ...filterViewStyles,
     }
+
+    // PANEL CONTAINER PROPS
+    const panelProps = {
+        data,
+        isRefreshing,
+        onRefresh: () => getData(true),
+        onPress: onPanelViewAllPress,
+        renderItem: renderPanelItem
+    }
+
     return (
-        <DashboardContainer {...dashboardProps} style={{backgroundColor: colors.primary}}>
-            {
-                data.map((panel, index) => {
-                    let panelType = panel.type === "carousel-medium" || panel.type === "carousel-large" ? "carousel" : panel.type;
-                    return (
-                        <Panel
-                            key={`panel_${index}`}
-                            {...panel}
-                            type={panelType}
-                            containerStyle={{ marginBottom: 15 }}
-                            ctaContainerStyle={{}}
-                            ctaTextStyle={{color: colors.text}}
-                            headerStyle={{color: colors.text, fontWeight: "500"}}
-                            onPress={panel.cta ? () => onPanelViewAllPress(panel) : null}
-                            renderItem={({ item, index }) => renderPanelItem({ item, index, panel })}
-                        />
-                    )
-                })
-            }
-        </DashboardContainer>
+        <SafeAreaView style={[{ flex: 1, backgroundColor: colors.primary }]}>
+            {/* If using the the filter view */}
+            <FilterView {...filterViewProps} />
+            {(isFetching) ? renderLoading() : (error) ? renderError() : (<PanelContainer {...panelProps}/>)}
+        </SafeAreaView>
     );
 };
 
-function DashboardContainer({ isFetching, isRefreshing, error, data, onRefresh, children, style }) {
-    const renderScrollViewContent = () => {
-        if (isFetching) return <ActivityIndicator style={[{ flex: 1 }]} />;
-
-        if (error) return <ErrorView message={error} />;
-
-        if (data.length === 0) return <EmptyView title={"No Data."} message={"No data to show"} titleStyle={{ color: "#aaa" }} textStyle={{ color: "#aaa" }} />
-
-        return (
-            <>
-                {children}
-            </>
-        )
+// PANEL CONTAINER
+const PanelContainer = ({ isRefreshing, onRefresh, data, onPress, renderItem }) => {
+    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+    const scrollViewProps = {
+        horizontal: false,
+        showsHorizontalScrollIndicator: false,
+        refreshControl: refreshControl,
+        contentContainerStyle: { flexGrow: 1 },
     }
 
-    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
     return (
-        <SafeAreaView style={[{flex: 1}]}>
-            <ScrollView
-                horizontal={false}
-                showsHorizontalScrollIndicator={false}
-                refreshControl={refreshControl}
-                style={[style]}
-                contentContainerStyle={{ flexGrow: 1 }}>
-                {renderScrollViewContent()}
-            </ScrollView>
-        </SafeAreaView>
+        <ScrollView {...scrollViewProps}>
+        {
+            data.map((panel, index) => {
+                return (
+                    <Panel
+                        key={`panel_${index}`}
+                        {...panel}
+                        type={panel.type}
+                        containerStyle={{ marginBottom: 15 }}
+                        ctaContainerStyle={{}}
+                        ctaTextStyle={{ color: colors.text }}
+                        headerStyle={{ color: colors.text, fontWeight: "500" }}
+                        onPress={panel.cta ? () => onPress(panel) : null}
+                        renderItem={({ item, index }) => renderItem({ item, index, panel })}
+                    />
+                )
+            })
+        }
+    </ScrollView>
     )
 }
+
+const filterViewStyles = StyleSheet.create({
+    headerStyle: { color: "white" },
+    containerStyle: {
+        backgroundColor: "transparent",
+    },
+    itemContainerStyle: {
+        backgroundColor: "transparent",
+        borderWidth: 0,
+        marginVertical: 0,
+        height: 34
+    },
+    itemTitleStyle: {
+        fontSize: 14,
+        color: "white",
+        fontWeight: "500"
+    },
+    selectedStyle: {
+        backgroundColor: "rgb(45, 45, 45)"
+    },
+    selectedTitleStyle: {
+        color: "#fff",
+    },
+    ctaStyle: { color: "#fff" },
+});
