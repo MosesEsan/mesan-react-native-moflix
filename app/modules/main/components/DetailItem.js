@@ -19,7 +19,7 @@ export default function DetailItem(props) {
     if (type === "header") return <HeaderItem {...props} />
     else if (type === "main") return <MainItem {...props} />
     else if (type === "seasons") return <SeasonsItem {...props} />
-    else if (type === "cast-crew") return <CastCrewItem {...props} />
+    else if (type === "credits") return <CastCrewItem {...props} />
     else if (type === "video") return <VideoItem {...props} />
     else if (type === "episode" || type === "episodes") return <EpisodeItem {...props} />
     else return null;
@@ -40,14 +40,12 @@ function HeaderItem({ item }) {
         return isFavorite(item);
     }, [favorites]);
 
-
     // ON ADD TO FAVORITE PRESSED
     const onToggleFavorite = () => toggleFavorite(item);
 
     // ==========================================================================================
     // 3 - STYLES
     // ==========================================================================================
-    const PADDING = 15
     const styles = {
         image: {
             width: "100%",
@@ -58,6 +56,53 @@ function HeaderItem({ item }) {
             alignItems: "flex-end",
         },
 
+        actionButtons: {
+            margin: 6,
+            padding: 6,
+            backgroundColor: "#eb4325",
+            borderRadius: 50,
+            maxWidth: 120,
+            height: 40,
+            paddingHorizontal: 25,
+            justifyContent: "center",
+            alignItems: "center",
+        },
+
+        buttonText: {
+            color: "white",
+            textAlign: "center",
+            fontWeight: "500",
+            fontSize: 14,
+        },
+
+        icon: {
+            marginRight: 8
+        }
+    };
+
+    return (
+        <ImageBackground imageStyle={styles.image} style={styles.image} source={{ uri: `${LARGE_IMAGE_URL}${backdrop_path}` || "" }} >
+            <Pressable style={[styles.actionButtons, { backgroundColor: "rgb(29, 29, 29)" }]} onPress={onToggleFavorite}>
+                <View style={{ flexDirection: "row", justifyContent: "center", alignContent: "center" }}>
+                    <Icon size={16} name={isItemFavorite ? "heart" : "hearto"} type="antdesign" color={isItemFavorite ? "red" : "white"} style={styles.icon} />
+                    <Text style={[styles.buttonText]}>
+                        {"Favorites"}
+                    </Text>
+                </View>
+            </Pressable>
+        </ImageBackground>
+    )
+}
+
+// ==========================================================================================
+// MAIN ITEM
+function MainItem(props) {
+    const { item } = props;
+    const { overview } = item;
+    const { backdrop_path, languages, genres, runtime, number_of_seasons, date } = useTMDB(item);
+
+    const PADDING = 15
+    const styles = {
         metaContainer: {
             paddingHorizontal: PADDING,
             justifyContent: "center",
@@ -108,74 +153,6 @@ function HeaderItem({ item }) {
             color: "#fff"
         },
 
-        actionButtons: {
-            margin: 6,
-            padding: 6,
-            backgroundColor: "#eb4325",
-            borderRadius: 50,
-            maxWidth: 120,
-            height: 40,
-            paddingHorizontal: 25,
-            justifyContent: "center",
-            alignItems: "center",
-        },
-
-        icon: {
-            marginRight: 8
-        },
-
-        buttonText: {
-            color: "white",
-            textAlign: "center",
-            fontWeight: "500",
-            fontSize: 14,
-        }
-    };
-
-    return (
-        <View style={[]}>
-            <ImageBackground imageStyle={styles.image} style={styles.image} source={{ uri: `${LARGE_IMAGE_URL}${backdrop_path}` || "" }} >
-                <Pressable style={[styles.actionButtons, { backgroundColor: "rgb(29, 29, 29)" }]} onPress={onToggleFavorite}>
-                    <View style={{ flexDirection: "row", justifyContent:"center", alignContent:"center" }}>
-                        <Icon size={16} name={isItemFavorite ? "heart" : "hearto"} type="antdesign" color={isItemFavorite ? "red" : "white"} style={styles.icon} />
-                        <Text style={[styles.buttonText]}>
-                            {"Favorites"}
-                        </Text>
-                    </View>
-                </Pressable>
-            </ImageBackground>
-            <View style={[styles.metaContainer]}>
-                <Text style={styles.title}>
-                    {item?.title || item?.name}
-                </Text>
-                <Text style={styles.subtitle} numberOfLines={2}>
-                    {`${languages} |`} {`${item?.release_date || item?.first_air_date}`} | {`${runtime || number_of_seasons}`}
-                </Text>
-            </View>
-
-            <View style={styles.genresContainer}>
-                {
-                    genres.map((genre, index) => {
-                        return (
-                            <View style={[styles.genreContainer]} key={index}>
-                                <Text style={styles.genreTitle}>{genre.name}</Text>
-                            </View>
-                        )
-                    })
-                }
-            </View>
-        </View>
-    )
-}
-
-// ==========================================================================================
-// MAIN ITEM
-function MainItem(props) {
-    const { item } = props;
-    const { overview } = item;
-
-    const PADDING = 15
-    const styles = {
         descriptionContainer: {
             flex: 1,
             paddingHorizontal: PADDING,
@@ -191,9 +168,32 @@ function MainItem(props) {
     };
 
     return (
-        <View style={styles.descriptionContainer}>
-            {item?.overview && <Text style={styles.description}>{overview}</Text>}
+        <View>
+            <View style={[styles.metaContainer]}>
+                <Text style={styles.title}>
+                    {item?.title || item?.name}
+                </Text>
+                <Text style={styles.subtitle} numberOfLines={2}>
+                    {`${languages} |`} {`${date}`} | {`${runtime || number_of_seasons}`}
+                </Text>
+            </View>
+
+            <View style={styles.genresContainer}>
+                {
+                    genres.map((genre, index) => {
+                        return (
+                            <View style={[styles.genreContainer]} key={index}>
+                                <Text style={styles.genreTitle}>{genre.name}</Text>
+                            </View>
+                        )
+                    })
+                }
+            </View>
+            <View style={styles.descriptionContainer}>
+                {item?.overview && <Text style={styles.description}>{overview}</Text>}
+            </View>
         </View>
+
     )
 }
 
@@ -226,7 +226,7 @@ function CastCrewItem(props) {
         },
         image: {
             height: 55,
-            width: 55, 
+            width: 55,
             borderRadius: 55 / 2,
             backgroundColor: colors.secondary,
             marginRight: 15,
@@ -238,7 +238,7 @@ function CastCrewItem(props) {
         let source = item?.profile_path ? { uri: `${IMAGE_URL}${item?.profile_path}` } : (gender == 0) ? require("../images/cast-male-empty.png") : require("../images/cast-female-empty.png");
         return <Image imageStyle={styles.image} style={styles.image} source={source} />
     }
-    
+
     let subtitle = item?.character || item?.job || ""
     return (
         <View style={[styles.container]}>

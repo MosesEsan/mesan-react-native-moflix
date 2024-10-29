@@ -21,10 +21,9 @@ export default function ModuleItem(props) {
 
     if (type === "category") return <CategoryItem {...props} />
     else if (type === "showcase") return <ShowCaseItem {...props} />
-    else if (type === "media") return <MediaItem {...props} />
-    else if (type === "media-medium") return <MediaItem item={item} {...props} size={'medium'} />
-    else if (type === "media-large") return <MediaItem item={item} {...props} size={'large'} />
+    else if (type === "media" || type === "media-medium" || type === "media-large") return <MediaItem {...props} />
     else if (type === "media-grid") return <GridMediaItem item={item} {...props} />
+    else if (type === "category-grid") return <GridCategoryItem {...props} />
     else return null;
 }
 
@@ -36,10 +35,9 @@ export function ShowCaseItem({ item }) {
     const navigation = useNavigation();
 
     // HOOKS
-    const { poster_path, release_date, first_air_date } = useTMDB(item);
+    const { poster_path, date } = useTMDB(item);
     const { favorites, isFavorite, toggleFavorite } = useModuleContext();
 
-    let subtitle = `${release_date || first_air_date}`;
     // ==========================================================================================
     // 2 - ACTION HANDLERS
     // ==========================================================================================
@@ -141,11 +139,11 @@ export function ShowCaseItem({ item }) {
     };
 
     const renderImage = () => {
-        let source = item?.poster_path ? { uri: `${IMAGE_URL}${item?.poster_path}` } : require("../images/media-empty.png");
+        let source = item?.poster_path ? { uri: `${IMAGE_URL}${poster_path}` } : require("../images/media-empty.png");
         return (
             <ImageBackground imageStyle={styles.showcaseImage} style={styles.showcaseImage} source={source}>
                 {/* <View style={styles.overlay} /> */}
-                <LinearGradient style={styles.overlay} colors={["rgba(0, 0, 0, 0.9)", "transparent", "rgba(0, 0, 0, 0.6)"]} />
+                <LinearGradient style={styles.overlay} colors={["rgba(0, 0, 0, 0.9)", "transparent", "rgba(0, 0, 0, 0.8)", "rgba(0, 0, 0, 0.9)"]} />
             </ImageBackground>
         )
     }
@@ -161,7 +159,7 @@ export function ShowCaseItem({ item }) {
                     <Text style={styles.title}>
                         {item?.title || item?.name}
                     </Text>
-                    {subtitle && <Text style={styles.subtitle}>{`${subtitle}`}</Text>}
+                    {date && <Text style={styles.subtitle}>{`${date}`}</Text>}
                     <View style={{ flexDirection: "row", marginTop: 8 }}>
                         <Pressable style={styles.actionButtons} onPress={onPress}>
                             <Text style={[styles.buttonText]}>
@@ -187,7 +185,11 @@ export function MediaItem(props) {
     // 1 - DECLARE VARIABLES
     // PROPS DESTRUCTURING
     const { item, fixed } = props;
-    const { poster_path } = item;
+
+    let size = null;
+    if (props?.type === "media-medium" || props?.type === "media-large"){
+        size = props?.type.split('-')[1];
+    }
 
     // NAVIGATION
     const navigation = useNavigation();
@@ -230,7 +232,7 @@ export function MediaItem(props) {
     let containerStyle = [styles.container]
     let style = [styles.image]
     if (fixed) {
-        let width = props?.size === "medium" ? 150 : props?.size === "large" ? 200 : 105;
+        let width = size === "medium" ? 150 : size === "large" ? 200 : 105;
         style.push({ width: width, height: width * 1.5 })
         containerStyle.push({ width: width })
     }
@@ -258,10 +260,21 @@ MediaItem.defaultProps = {
 }
 
 export function GridMediaItem(props) {
+    const styles = {
+        container: {
+            flex: 1 / 3,
+            paddingBottom: 6,
+            position: 'relative',
+            width: '100%',
+            paddingRight: 4,
+            paddingLeft: 4,
+            paddingVertical: 4
+        }
+    }
     return (
-        <GridItemWrapper style={{ paddingVertical: 4, paddingRight: 4, paddingLeft: 4 }}>
+        <View style={styles.container}>
             <MediaItem {...props} fixed={false} />
-        </GridItemWrapper>
+        </View>
     )
 }
 
@@ -271,7 +284,7 @@ export function CategoryItem(props) {
     const navigation = useNavigation();
     const { item } = props;
 
-    let onPress = () => navigation.navigate('List', { category: item });
+    let onPress = () => navigation.push('List', { category: item });
 
     const styles = {
         container: {
@@ -297,7 +310,7 @@ export function CategoryItem(props) {
     }
     return (
         <Pressable onPress={onPress}>
-            <View style={[styles.container]}>
+            <View style={[styles.container, props?.style]}>
                 <Text style={styles.title}>{item.name}</Text>
             </View>
         </Pressable>
@@ -305,9 +318,25 @@ export function CategoryItem(props) {
 }
 
 export function GridCategoryItem(props) {
+    const styles = {
+        container: {
+            flex: 1 / 2,
+            paddingBottom: 6,
+            position: 'relative',
+            width: '100%',
+            paddingRight: 4,
+            paddingLeft: 4,
+            paddingVertical: 4,
+        },
+
+        innerContainer: {
+            height: 55,
+            borderRadius: 0,
+        },
+    }
     return (
-        <GridItemWrapper style={{ paddingVertical: 4, paddingRight: 4, paddingLeft: 4 }}>
-            <CategoryItem {...props} />
-        </GridItemWrapper>
+        <View style={styles.container}>
+            <CategoryItem {...props} style={styles.innerContainer} />
+        </View>
     )
 }
