@@ -6,16 +6,14 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
 import Panel from "mesan-react-native-panel";
-import { ErrorView, useCRUD, NavBackButton, NavButtons } from "react-native-helper-views";
+import { ErrorView, NavBackButton, NavButtons } from "react-native-helper-views";
 
-// PROVIDERS
+// HOOKS
+import useFetch from '../hooks/useFetch';
 import { useModuleContext } from "../core/Provider";
 
 // SERVICES
 import { getDetails } from '../core/Service';
-
-// if using GRAPHQL
-// import { GET_CATEGORY_DATA, ADD_TO_FAVOURITES } from "../ModuleService";
 
 // COMPONENTS
 import DetailItem from "../components/DetailItem";
@@ -25,63 +23,48 @@ import useTMDB from '../hooks/useTMDB';
 
 // CONFIG
 import { colors } from "../core/Config"
-import useFavorites from '../hooks/useFavorites';
+import PanelContainer from '../components/PanelContainer';
 
 // STYLES
 // import { styles } from "../../../styles";
 
 export default function Details(props) {
     // 1 - DECLARE VARIABLES
-    
+
     // NAVIGATION HOOKS
     const navigation = useNavigation();
-    const route = useRoute();
 
     // ROUTE PARAMS
+    const route = useRoute();
     const item = route.params?.item;
 
     // FAVORITES CONTEXT
     const { favorites, isFavorite, toggleFavorite } = useModuleContext();
 
-    // If not using Provider
-    const {
-        data, error,
-        create, read, update, destroy,
-        isFetching, isRefreshing,
-        setIsRefreshing, setIsFetching,
-        setLoading, setData, setError
-    } = useCRUD(item);
+    // LOADING STATE AND ERROR
+    const [
+        //page, nextPage, totalResults, isFetchingNextPage
+        { data, error, isFetching, isRefreshing },
+        //  setPage, setNextPage, setTotalResults, setIsFetchingNextPage, setAPIResponse
+        { setData, setError, setIsFetching, setIsRefreshing, setLoadingState }
+    ] = useFetch();
 
+
+    const { videos, seasons, cast } = useTMDB(data);
     const [panels, setPanels] = useState([])
 
-    // ===========================================================================================
-    //1A - GRAPHQL
-    // if using GRAPHQL
-    // QUERY
-    // const [getCategoryData, {refetch}] = useLazyQuery(GET_CATEGORY_DATA, {
-    //     onCompleted, onError
-    // });
-
-    //  MUTATION    
-    // const [addFavourite] = useMutation(ADD_TO_FAVOURITES, {
-    //     onCompleted: () => alert("You have added tho your favourites"),
-    //     onError: (error) => alert(error.message)
-    // });
-
     //==================================================================================================
-    //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
-    // const navButtons = [
-    //     {
-    //         onPress: () => onToggle(),
-    //         name: isItemFavorite ? "star" : "staro",
-    //         type: "antdesign",
-    //         color: "#fff",
-    //         style: { paddingLeft: 5 }
-    //     }
-    // ];
-
     //1B -NAVIGATION CONFIG
     useLayoutEffect(() => {
+        // const navButtons = [
+        //     {
+        //         onPress: () => onToggle(),
+        //         name: isItemFavorite ? "star" : "staro",
+        //         type: "antdesign",
+        //         color: "#fff",
+        //         style: { paddingLeft: 5 }
+        //     }
+        // ];
         navigation.setOptions({
             headerTitle: "",
             // headerTitle: item.name || item.title || "Details",
@@ -100,26 +83,26 @@ export default function Details(props) {
 
     //2b - GET DATA
     async function getData(refresh = false) {
-        // If not refreshing, empty the data array - OPTIONAL
-        if (!refresh) setData([]);
-
-        if (!refresh) setIsFetching(true); 
-        else setIsRefreshing(true)
-
-        setData(item);
-
-        // if using GRAPHQL
-        // const variables = {} //Add any required variables/params
-        // if (refresh) await refetch(variables)
-        // else await getDetails({variables})
-
         try {
+            // set the loading state
+            if (!refresh) setIsFetching(true);
+            else setIsRefreshing(true)
+
+            // Set the passed item as the data
+            setData(item);
+
+            // make the API call and contruct the params
             let params = { append_to_response: "credits,videos" }
             let response = await getDetails(item?.release_date ? 'movie' : 'tv', item.id, params);
-            onCompleted(response);
+
+            // set the data
+            setData(response);
+            setPanels(getPanels(response))
+            setError(null);
         } catch (error) {
-            alert(error.message);
-            onError(error);
+            setError(error.message);
+        } finally {
+            setLoadingState(false, false);
         }
     }
 
@@ -142,12 +125,13 @@ export default function Details(props) {
                 id: 1,
                 title: "Cast",
                 type: "default",
-                itemType: "cast-crew",
+                itemType: "credits",
                 data: cast,
                 max: 6,
                 cta: true,
-                onPress: () => navigation.push("List", { title: "Cast", data: cast, columns: 1, type: 'cast-crew' })
+                onPress: () => navigation.push("Credits", { item })
             },
+            // VIDEOS
             {
                 id: 2,
                 title: "Videos",
@@ -156,45 +140,23 @@ export default function Details(props) {
                 data: videos
             },
         ]
+
         panels.map((p) => {
-            // if the data length is greater than 0, updater the renderItem
-            // else remove the panel
-            if (p.data.length > 0){
-                p['renderItem'] = (props) => <DetailItem {...props} type={p?.itemType} size={p?.itemSize} />
-            }else{
-                panels = panels.filter(panel => panel.id !== p.id)
-            }
+            p['containerStyle'] = { marginBottom: 15 };
+            p['headerStyle'] = { color: colors.text, fontWeight: "500" };
+            p['ctaTextStyle'] = { color: colors.text };
+            // if the data length is greater than 0, update the renderItem function
+            if (p.data.length > 0)  p['renderItem'] = (props) => <DetailItem {...props} type={p?.itemType} size={p?.itemSize} />
+            else panels = panels.filter(panel => panel.id !== p.id); // remove the panel
         })
 
         return panels;
     }
 
     //===========================================================================================
-    //3 - API RESPONSE HANDLERS
-    //===========================================================================================
-    function onCompleted(data) {
-        // if using GRAPHQL
-        // if (data && data.products) setData(data.products)
-
-        // else if using RESTAPI
-        setData(data);
-        setPanels(getPanels(data))
-
-        setError(null);
-        setIsFetching(false)
-        setIsRefreshing(false)
-    }
-
-    function onError(error) {
-        setError(error.message)
-        setIsFetching(false)
-        setIsRefreshing(false)
-    }
-
+    //3 - UI ACTION HANDLERS
     //==============================================================================================
-    //4 -  UI ACTION HANDLERS
-    //==============================================================================================
-    //4a - RENDER SCROLLVIEW VIEW CONTENT
+    //3a - RENDER SCROLLVIEW VIEW CONTENT
     const renderScrollViewContent = () => {
         if (isFetching) return <ActivityIndicator style={[{ flex: 1 }]} />;
 
@@ -205,7 +167,7 @@ export default function Details(props) {
                 <DetailItem type={'header'} item={data} />
                 <View style={{ flex: 1 }}>
                     <DetailItem type={'main'} item={data} />
-                    <MetaAdditional panels={panels} />
+                    <PanelContainer data={panels}/>
                 </View>
             </View>
         )
@@ -216,7 +178,7 @@ export default function Details(props) {
     //==========================================================================================
     const isItemFavorite = useMemo(() => {
         return isFavorite(item);
-    }, [favorites ]);
+    }, [favorites]);
 
     const onToggle = () => {
         toggleFavorite(item);
@@ -244,21 +206,3 @@ export default function Details(props) {
         </SafeAreaView>
     );
 };
-
-
-const MetaAdditional = ({ panels }) => {
-    return (
-        <View style={{ flex: 1 }}>
-            {panels.map((panel, index) => {
-                return (
-                    <Panel key={`panel_${index}`} {...panel}
-                        containerStyle={{ marginBottom: 15 }}
-                        ctaContainerStyle={{}}
-                        ctaTextStyle={{ color: colors.text }}
-                        headerStyle={{ color: colors.text, fontWeight: "500" }}
-                    />
-                )
-            })}
-        </View>
-    )
-}
