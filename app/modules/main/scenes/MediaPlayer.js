@@ -12,6 +12,8 @@ import Orientation from 'react-native-orientation-locker';
 import { colors } from "../core/Config"
 
 export default function MediaPlayer(props) {
+    //1 - DECLARE VARIABLES
+    // ROUTE PARAMS
     const route = useRoute();
     const video = route.params?.video;
     
@@ -19,16 +21,11 @@ export default function MediaPlayer(props) {
     // 2 - MAIN CODE BEGINS HERE
     // ==========================================================================================
     useEffect(() => {
-        if (isFullScreen) {
-            Orientation.lockToLandscape();
-        } else {
-            Orientation.lockToPortrait();
-        }
+        Orientation.lockToLandscape();
         return () => {
             Orientation.unlockAllOrientations();
         }
-
-    }, [section]);
+    }, []);
 
     // function checkFullScreen(isFullScreen) {
     //     if (isFullScreen) {
