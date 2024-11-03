@@ -10,7 +10,7 @@ import { ErrorView, NavBackButton, NavButtons } from "react-native-helper-views"
 
 // HOOKS
 import useFetch from '../hooks/useFetch';
-import { useModuleContext } from "../core/Provider";
+import useFavorites from '../hooks/useFavorites';
 
 // SERVICES
 import { getDetails } from '../core/Service';
@@ -37,7 +37,7 @@ export default function Details(props) {
     const item = route.params?.item;
 
     // FAVORITES CONTEXT
-    const { favorites, isFavorite, toggleFavorite } = useModuleContext();
+    const { favorites, isFavorite, toggleFavorite } = useFavorites();
 
     // LOADING STATE AND ERROR
     const [

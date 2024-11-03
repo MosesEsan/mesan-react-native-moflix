@@ -6,12 +6,11 @@ import { useNavigation } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
 import { Icon } from '@rneui/themed';
-import { GridItemWrapper } from "mesan-react-native-panel";
 import LinearGradient from 'react-native-linear-gradient';
 
 // HOOKS
 import useTMDB from '../hooks/useTMDB';
-import { useModuleContext } from '../core/Provider';
+import useFavorites from '../hooks/useFavorites';
 
 // CONFIG
 import { colors, IMAGE_URL } from "../core/Config"
@@ -36,8 +35,8 @@ export function ShowCaseItem({ item }) {
 
     // HOOKS
     const { poster_path, date } = useTMDB(item);
-    const { favorites, isFavorite, toggleFavorite } = useModuleContext();
-
+    const { favorites, isFavorite, toggleFavorite } = useFavorites();
+    
     // ==========================================================================================
     // 2 - ACTION HANDLERS
     // ==========================================================================================

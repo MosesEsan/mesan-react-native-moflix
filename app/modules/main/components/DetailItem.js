@@ -9,7 +9,7 @@ import { Icon } from '@rneui/themed';
 
 // HOOKS
 import useTMDB from '../hooks/useTMDB';
-import { useModuleContext } from '../core/Provider';
+import useFavorites from '../hooks/useFavorites';
 
 // CONFIG
 import { colors, IMAGE_URL, LARGE_IMAGE_URL, YOUTUBE_URL } from "../core/Config"
@@ -30,8 +30,8 @@ export default function DetailItem(props) {
 function HeaderItem({ item }) {
     // 1 - DECLARE VARIABLES
     // HOOKS
-    const { backdrop_path, languages, genres, runtime, number_of_seasons } = useTMDB(item);
-    const { favorites, isFavorite, toggleFavorite } = useModuleContext();
+    const { backdrop_path } = useTMDB(item);
+    const { favorites, isFavorite, toggleFavorite } = useFavorites();
 
     // ==========================================================================================
     // 2 - ACTION HANDLERS
@@ -239,7 +239,10 @@ function CastCrewItem(props) {
         return <Image imageStyle={styles.image} style={styles.image} source={source} />
     }
 
-    let subtitle = item?.character || item?.job || ""
+    let subtitle = item?.character || item?.job;
+    if (item?.roles) subtitle = item?.roles[0]?.character || "";
+    else if (item?.jobs) subtitle = item?.jobs[0]?.job  || "";
+
     return (
         <View style={[styles.container]}>
             <View style={styles.image}>

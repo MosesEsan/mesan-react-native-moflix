@@ -2,7 +2,6 @@ import React, { useMemo, useContext, createContext, useState } from 'react';
 
 //CREATE REDUCER
 import { useCRUD } from "react-native-helper-views";
-import useFavorites from '../hooks/useFavorites';
 
 // CONTEXT ==================================
 export const moduleContext = createContext();
@@ -17,16 +16,6 @@ export default function ModuleProvider(props) {
 
     // CRUD HOOK
     const dataProvider = useCRUD([])
-
-    // FAVORITES HOOK
-    const {         
-        favorites,
-        getFavorites,
-        addFavorite,
-        removeFavorite,
-        isFavorite,
-        toggleFavorite
-     } = useFavorites();
 
     // ==========================================================================================
     // 2 - ACTION HANDLERS
@@ -57,17 +46,9 @@ export default function ModuleProvider(props) {
         setData, clearData, setError,
 
         sections, setSections,
-        section, setSection,
+        section, setSection
 
-        // FAVORITES
-        favorites,
-        getFavorites,
-        addFavorite,
-        removeFavorite,
-        isFavorite,
-        toggleFavorite
-
-    }), [data, error, isFetching, isRefreshing, section, favorites]);
+    }), [data, error, isFetching, isRefreshing, section]);
 
     return (
         <Provider value={value}>

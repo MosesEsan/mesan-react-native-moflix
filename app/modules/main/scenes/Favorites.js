@@ -12,6 +12,7 @@ import { } from "../core/Service";
 
 // HOOKS
 import { useModuleContext } from '../core/Provider';
+import useFavorites from '../hooks/useFavorites';
 
 // COMPONENTS
 import ModuleItem from "../components/ModuleItem";
@@ -32,7 +33,7 @@ export default function Favorites(props) {
     const route = useRoute();
 
     // HOOKS
-    const { favorites, getFavorites } = useModuleContext();
+    const { favorites, getFavorites } = useFavorites();
 
     // LOADING STATE AND ERROR
     const {
