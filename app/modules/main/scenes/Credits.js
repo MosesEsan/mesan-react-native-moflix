@@ -23,25 +23,18 @@ import { colors } from "../core/Config"
 // STYLES
 // import { styles } from "../styles";
 
+// FILTER VIEW DATA
 const SECTIONS = [
     { id: 1, name: "Cast" },
     { id: 2, name: "Crew" }
 ]
 
-export default function Dashboard({ }) {
+export default function Credits(props) {
     //1 - DECLARE VARIABLES
     // NAVIGATION
     const navigation = useNavigation();
 
     // HOOKS
-
-    // LOADING STATE AND ERROR
-    const [
-        //page, nextPage, totalResults, isFetchingNextPage
-        { data, error, isFetching, isRefreshing },
-        //  setPage, setNextPage, setTotalResults, setIsFetchingNextPage, setAPIResponse
-        { setData, setError, setIsFetching, setIsRefreshing, setLoadingState }
-    ] = useFetch();
 
     // ROUTE PARAMS
     // If the data was passed as a Route parameter
@@ -51,6 +44,14 @@ export default function Dashboard({ }) {
     // FILTER VIEW VARIABLES
     // const [sections, setSections] = useState([]);
     const [section, setSection] = useState(SECTIONS[0]);
+
+    // LOADING STATE AND ERROR
+    const [
+        //page, nextPage, totalResults, isFetchingNextPage
+        { data, error, isFetching, isRefreshing },
+        //  setPage, setNextPage, setTotalResults, setIsFetchingNextPage, setAPIResponse
+        { setData, setError, setIsFetching, setIsRefreshing, setLoadingState }
+    ] = useFetch();
 
     //==========================================================================================
     // 2 - MAIN CODE BEGINS HERE
@@ -70,8 +71,11 @@ export default function Dashboard({ }) {
             // set the loading state
             setLoadingState(!refresh, refresh);
 
-            const { credits = {} } = item;
-            const { crew = [], cast = [] } = credits;
+            let slug = item.hasOwnProperty("number_of_episodes") ? "tv" : "movie";
+
+            const response = await getCredits(slug, item.id); 
+
+            const { crew = [], cast = [] } = response;
 
             if (section.id === 1) setData(cast);
             else setData(crew);

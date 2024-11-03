@@ -4,7 +4,6 @@ import { sections, getUrls} from '../data/sections';
 
 const API_URL = 'https://api.themoviedb.org/3/'
 const DISCOVER_ENDPOINT = 'discover/'
-const FIND_ENDPOINT = 'movie/'
 const SEARCH_ENDPOINT = 'search/'
 
 export const HEADERS = {
@@ -111,7 +110,8 @@ export async function getSeasonEpisodes(series_id, season_number, params = {}) {
 // ==========================================================================================
 // GET MEDIA CREDITS
 export async function getCredits(section, id, params = {}) {
-    return apiCall(`${API_URL}${section}/${id}/credits`, params, HEADERS);
+    let endpoint = section === 'tv' ? 'aggregate_credits' : 'credits';
+    return apiCall(`${API_URL}${section}/${id}/${endpoint}`, params, HEADERS);
 }
 
 // ==========================================================================================
