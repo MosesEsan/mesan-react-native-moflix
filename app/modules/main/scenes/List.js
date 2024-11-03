@@ -5,10 +5,11 @@ import { SafeAreaView, FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
-import { NavBackButton, ErrorView, EmptyView } from "react-native-helper-views";
+import { NavButtons, NavBackButton, ErrorView, EmptyView } from "react-native-helper-views";
 import { useInfiniteQuery } from '@tanstack/react-query'
 
 // HOOKS
+import useFetch from '../hooks/useFetch';
 import { useModuleContext } from "../core/Provider";
 
 // SERVICES
@@ -47,13 +48,13 @@ export default function List(props) {
     const category = route.params?.category;
 
     // if an array of data is passed as a prop
-    const item = route.params?.item;
+    // const item = route.params?.item;
 
     // The scene is used as the ModuleItem type
     const scene = route.params?.type;
 
     // the flatlist defults to 2 columns, to change this, a props can be pased
-    const columns = (panel && panel?.item_type === "category") ? 2  : route.params?.columns || FLATLIST_COLUMNS;
+    const columns = (panel && panel?.item_type === "category") ? 2 : route.params?.columns || FLATLIST_COLUMNS;
 
     // LOADING STATE AND ERROR
     const {
@@ -74,6 +75,13 @@ export default function List(props) {
         },
     });
 
+    // const [
+    //     //page, nextPage, totalResults, isFetchingNextPage
+    //     { data, error, isFetching, isRefreshing },
+    //     //  setPage, setNextPage, setTotalResults, setIsRefreshing, setIsFetchingNextPage, setAPIResponse
+    //     { setData, setError, setIsFetching, setLoadingState }
+    // ] = useFetch();
+
     //========================================================================================
     //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
     useLayoutEffect(() => {
@@ -90,9 +98,30 @@ export default function List(props) {
     //2b - GET DATA
     async function getData({ pageParam }) {
         if (category) return await getWithCategory(pageParam);
-        else if (scene === "episodes") return await getEpisodes(); 
-        else return await getPanel(panel?.url, { page:pageParam });
+        else if (scene === "episodes") return await getEpisodes();
+        else return await getPanel(panel?.url, { page: pageParam });
     }
+
+    // 2c - GET DATA
+    // async function getData(refresh = false, params = {}) {
+    //     try {
+    //         // set the loading state
+    //         setLoadingState(!refresh, refresh);
+
+    //         const response = null;
+
+    //         if (category) response = await getWithCategory(pageParam);
+    //         else if (scene === "episodes") response = await getEpisodes(); 
+    //         else response = await getPanel(panel?.url, { page:pageParam });
+
+    //         // set the data
+    //         if (response) setData(response);
+    //     } catch (error) {
+    //         setError(error.message);
+    //     } finally {
+    //         setLoadingState(false, false);
+    //     }
+    // }
 
     // 2c - GET DATA BY CATEGORY
     async function getWithCategory(page) {
@@ -126,7 +155,7 @@ export default function List(props) {
         if (panel && panel?.item_type === "category") return <ModuleItem type={'category-grid'} item={item} />
 
         if (scene) return <DetailItem type={scene} item={item} />
-        
+
         return <ModuleItem type={'media-grid'} item={item} size={"medium"} />
     }
 
@@ -139,7 +168,7 @@ export default function List(props) {
 
     //3c - RENDER FOOTER
     const renderFooter = () => {
-        return hasNextPage && isFetchingNextPage ? (
+        return isFetchingNextPage ? (
             <ActivityIndicator size="small" color={colors.text} style={{ height: 50 }} />
         ) : null;
     };
@@ -158,7 +187,12 @@ export default function List(props) {
     //4 -  ACTION HANDLERS
     //==========================================================================================
     // If using Infinite Scroll - Load More Data
-    let onEndReached = () => !isFetching && fetchNextPage()
+    function onEndReached() {
+        if (!isFetching && !isFetchingNextPage && hasNextPage) {
+            // setIsFetchingNextPage(true);
+            fetchNextPage()
+        }
+    }
 
     const listData = useMemo(() => {
         return data && data.pages.map(page => {
@@ -176,8 +210,8 @@ export default function List(props) {
     //==========================================================================================
     //5a - FLATLIST PROPS
     const listProps = {
-        // data: data.pages.map(page => page.results).flat(),
-        // extraData: data.pages.map(page => page.results).flat(),
+        data: listData,
+        extraData: listData,
         initialNumToRender: 10,
         numColumns: columns,
 
@@ -205,7 +239,7 @@ export default function List(props) {
     return (
         <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
             {/* //If using Flatlist */}
-            <FlatList {...listProps} data={listData} extraData={listData} />
+            <FlatList {...listProps} />
         </SafeAreaView>
     );
 };
