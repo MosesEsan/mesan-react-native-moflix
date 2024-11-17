@@ -11,7 +11,6 @@ import { useCRUD, DataStatusView, NavBackButton } from "react-native-helper-view
 import { } from "../core/Service";
 
 // HOOKS
-import { useModuleContext } from '../core/Provider';
 import useFavorites from '../hooks/useFavorites';
 
 // COMPONENTS

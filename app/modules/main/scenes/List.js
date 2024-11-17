@@ -99,7 +99,7 @@ export default function List(props) {
     async function getData({ pageParam }) {
         if (category) return await getWithCategory(pageParam);
         else if (scene === "episodes") return await getEpisodes();
-        else return await getPanel(panel?.url, { page: pageParam });
+        else return await getPanel(panel?.id, { page: pageParam });
     }
 
     // 2c - GET DATA
@@ -144,6 +144,13 @@ export default function List(props) {
         return await getSeasonEpisodes(series_id, season_number);
     }
 
+    // // 2c - FETCH NEXT PAGE
+    // function fetchNextPage() {
+    //     if (nextPage) {
+    //         setIsFetchingNextPage(true);
+    //         search(searchValue, nextPage, more = true);
+    //     }
+    // }
     //==============================================================================================
     //3 -  UI ACTION HANDLERS
     //==============================================================================================
@@ -200,10 +207,11 @@ export default function List(props) {
             // if the key is episodes, use it else return the data
             if (page?.results) return page.results;
             if (page?.episodes) return page.episodes;
-            if (page?.genres) return page.genres;
+            if (page?.genres) return page.genres; 
+            if (page?.data) return page.data;
             return []
         }).flat()
-    }, [data])
+    }, [data]);
 
     // ==========================================================================================
     // 5 - VIEW PROPS

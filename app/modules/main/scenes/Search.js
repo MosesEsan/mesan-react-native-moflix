@@ -5,9 +5,9 @@ import { Text, SafeAreaView, ActivityIndicator, FlatList, StyleSheet, View, Pres
 import { useNavigation } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
+import axios from 'axios';
 import { EmptyView, ErrorView, CustomNavTitle } from "react-native-helper-views";
 import { SearchBar } from '@rneui/themed';
-import axios from 'axios';
 
 // HOOKS
 import useFetch from '../hooks/useFetch';
@@ -21,13 +21,12 @@ import ModuleItem from "../components/ModuleItem";
 // CONFIG
 import { colors } from "../core/Config";
 
-export default function SceneName(props) {
+export default function Search(props) {
     // 1 - DECLARE VARIABLES
     // NAVIGATION
     const navigation = useNavigation();
 
     // LOADING STATE AND ERROR
-    // const [error, setError] = useState(null);
     const [searchValue, setSearchValue] = useState("");
     const [searchType, setSearchType] = useState(null);
     const [cancelToken, setCancelToken] = useState('');
@@ -55,7 +54,7 @@ export default function SceneName(props) {
     }, [searchValue]);
 
     //2b - GET DATA
-    async function search(query, page = 1, more = false) {
+    async function search(query=searchValue, page = 1, more = false) {
         if (!more) setIsFetching(true);
 
         // Cancel the previous request before making a new request
@@ -81,7 +80,7 @@ export default function SceneName(props) {
     }
 
     // 2c - FETCH NEXT PAGE
-    function fetchNextPage() {
+    async function fetchNextPage() {
         if (nextPage) {
             setIsFetchingNextPage(true);
             search(searchValue, nextPage, more = true);

@@ -5,21 +5,21 @@ import { View, SafeAreaView, RefreshControl, ActivityIndicator, ScrollView } fro
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
-import Panel, { PanelContainer } from 'mesan-react-native-panel';  
-import { ErrorView, NavBackButton, NavButtons } from "react-native-helper-views";
+// Panel,
+import { PanelContainer } from 'mesan-react-native-panel';  
+// , NavBackButton, NavButtons
+import { ErrorView } from "react-native-helper-views";
 
 // HOOKS
 import useFetch from '../hooks/useFetch';
 import useFavorites from '../hooks/useFavorites';
+import useTMDB from '../hooks/useTMDB';
 
 // SERVICES
 import { getDetails } from '../core/Service';
 
 // COMPONENTS
 import DetailItem from "../components/DetailItem";
-
-// HOOKS
-import useTMDB from '../hooks/useTMDB';
 
 // CONFIG
 import { colors } from "../core/Config"

@@ -205,7 +205,6 @@ function CastCrewItem(props) {
         container: {
             justifyContent: "center",
             alignItems: "center",
-            marginHorizontal: 8,
             flexDirection: "row",
             flex: 1,
             marginHorizontal: 12,
@@ -315,7 +314,8 @@ function EpisodeItem(props) {
     const styles = {
         container: {
             flex: 1,
-            marginBottom: PADDING
+            marginBottom: PADDING,
+            paddingHorizontal: 12,
         },
         topContainer: {
             flex: 1,
