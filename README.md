@@ -1,9 +1,12 @@
 # MoFlix
-MoFlix is a Netflix Semi-Clone an iOS mobile application built with React Native using The Movie Database (TMDB) API. 
+MoFlix is a Netflix Semi-Clone iOS mobile application built with React Native, using The Movie Database (TMDB) API and a custom API built with ExpressJS. 
 
-Users can view all Popular, Trending Movies and TV Shows, view by Categories and Search for a Movie or TV Show. 
+![Screenshot 1](https://github.com/MosesEsan/mesan-react-native-moflix/blob/main/assets/screenshots/merge1.jpg?raw=true)
 
-React Native is a JavaScript-based mobile app framework for building natively-rendered mobile apps for iOS and Android.
+![Screenshot 2](https://github.com/MosesEsan/mesan-react-native-moflix/blob/main/assets/screenshots/merge2.jpg?raw=true)
+
+
+The custom API handles the returning of the dashboard panels and allows the creating of new panels for each section, the TMDB API takes care of retrieving the movies and tv shows details. 
 
 # Features
 - Dashboard - Panel Based dashboard displaying the Trending and Popular Movies & TV Shows.
@@ -11,8 +14,12 @@ React Native is a JavaScript-based mobile app framework for building natively-re
 - Favorites - Add movies or tv shows to your Favorites list.
 - Search - Search for a movie ot tv show.
 
+# Technologies Used
+- **React Native**: React Native is a JavaScript-based mobile app framework for building natively-rendered mobile apps for iOS and Android.
+
 # API Used
 - [The Movie Database (TMDB) API](https://developer.themoviedb.org/docs/getting-started)
+- [MoFlix ExpressJS API](https://github.com/MosesEsan/mesan-expressjs-moflix-api-cms)
 
 # Packages Used
 **Core**
