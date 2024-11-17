@@ -1,10 +1,5 @@
 import axios from 'axios';
-
-import { sections, getUrls} from '../data/sections';
-
-const API_URL = 'https://api.themoviedb.org/3/'
-const DISCOVER_ENDPOINT = 'discover/'
-const SEARCH_ENDPOINT = 'search/'
+import { CRUD_API_URL, SECTIONS_ENDPOINT, PANELS_ENDPOINT, TMDB_API_URL, DISCOVER_ENDPOINT, SEARCH_ENDPOINT } from './Config';
 
 export const HEADERS = {
     headers: {
@@ -15,7 +10,7 @@ export const HEADERS = {
 // =============================================================================================
 // HELPER FUNCTIONS
 // =============================================================================================
-export async function apiCall(url, params, headers={}) {
+export async function apiCall(url, params={}, headers={}) {
     try {
         url = `${url}?${Object.keys(params).map(key => `${key}=${params[key]}`).join('&')}`;
         let res = await axios.get(url, headers);
@@ -28,15 +23,10 @@ export async function apiCall(url, params, headers={}) {
 // =============================================================================================
 // CRUD OPERATIONS
 // =============================================================================================
-// GET ALL DATA - INDEX
-export async function getAll(params = {language: 'en-US'}) {
-    // return apiCall(`${API_URL}${FIND_ENDPOINT}/912649/videos`, params, HEADERS);
-}
-
 // OTHER CRUD OPERATIONS
 // READ CONTENT - GET DETAILS
 export async function getDetails(type, id, params) {
-    return apiCall(`${API_URL}${type}/${id}`, params, HEADERS);
+    return await apiCall(`${TMDB_API_URL}${type}/${id}`, params, HEADERS);
 }
 
 // ===============================================================================================
@@ -44,44 +34,17 @@ export async function getDetails(type, id, params) {
 // ===============================================================================================
 // Get the Sections List
 export async function getSections() {
-    // return apiCall(`${API_URL}${SECTIONS_ENDPOINT}`, params, HEADERS);
-    try {
-        return { sections };
-    } catch (e) {
-        throw new Error(e);
-    }
+    return await apiCall(`${CRUD_API_URL}${SECTIONS_ENDPOINT}`);
 }
 
 // Get Section Panels
-export async function getDashboard(params = {}) {
-    try {
-        let endpoints = getUrls(params['section']);
-        const urls = endpoints.map(({ url }) => axios.get(url, HEADERS));
-
-        // let res = await axios.get(`${API_URL}${SECTIONS_ENDPOINT}/${params['id']}`);
-        let res = await axios.all(urls);
-        let panels = [];
-        res.map((result, idx) => {
-            let panel = { ...endpoints[idx] };    
-            let data = result.data.genres || result.data.results || [];
-    
-            // If it is ther first (Trending), use the first item a the Hero item and the rest fopr the carousel
-            if (idx === 1) {
-                panels.unshift({ id:0, type:"showcase", item_type:"showcase", data: data[0] })
-                data = data.slice(1)
-            }
-            panel = { ...panel, data, title: panel.name };
-            panels.push(panel)
-        });
-        return panels;
-    } catch (e) {
-        throw new Error(e);
-    }
+export async function getPanels(params = {}) {
+    return await apiCall(`${CRUD_API_URL}${SECTIONS_ENDPOINT}/${params['section_id']}/${PANELS_ENDPOINT}`, params);
 }
 
 // Get Panel Data
-export async function getPanel(path, params = {}) {
-    return apiCall(path, params, HEADERS);
+export async function getPanel(id, params = {}) {
+    return await apiCall(`${CRUD_API_URL}${PANELS_ENDPOINT}${id}`, params);
 }
 
 // ==========================================================================================
@@ -89,12 +52,12 @@ export async function getPanel(path, params = {}) {
 // ==========================================================================================
 // GET CATEGORIES - INDEX
 export async function getCategories(section, params) {
-    return await apiCall(`${API_URL}genre/${section}/list`, params, HEADERS);
+    return await apiCall(`${TMDB_API_URL}genre/${section}/list`, params, HEADERS);
 }
 
 // GET CATEGORY DATA - READ
 export async function getByCategory(section, params) {
-    return await apiCall(`${API_URL}${DISCOVER_ENDPOINT}/${section}`, params, HEADERS);
+    return await apiCall(`${TMDB_API_URL}${DISCOVER_ENDPOINT}/${section}`, params, HEADERS);
 }
 
 // ==========================================================================================
@@ -102,7 +65,7 @@ export async function getByCategory(section, params) {
 // ==========================================================================================
 // GET SEASON EPISODES
 export async function getSeasonEpisodes(series_id, season_number, params = {}) {
-    return apiCall(`${API_URL}tv/${series_id}/season/${season_number}`, params, HEADERS);
+    return apiCall(`${TMDB_API_URL}tv/${series_id}/season/${season_number}`, params, HEADERS);
 }
 
 // ==========================================================================================
@@ -111,7 +74,7 @@ export async function getSeasonEpisodes(series_id, season_number, params = {}) {
 // GET MEDIA CREDITS
 export async function getCredits(section, id, params = {}) {
     let endpoint = section === 'tv' ? 'aggregate_credits' : 'credits';
-    return apiCall(`${API_URL}${section}/${id}/${endpoint}`, params, HEADERS);
+    return apiCall(`${TMDB_API_URL}${section}/${id}/${endpoint}`, params, HEADERS);
 }
 
 // ==========================================================================================
@@ -119,5 +82,5 @@ export async function getCredits(section, id, params = {}) {
 // ==========================================================================================
 // SEARCH BY NAME
 export async function searchByName(mediaType='multi', params) {
-    return apiCall(`${API_URL}${SEARCH_ENDPOINT}${mediaType}`, params, HEADERS);
+    return apiCall(`${TMDB_API_URL}${SEARCH_ENDPOINT}${mediaType}`, params, HEADERS);
 }
