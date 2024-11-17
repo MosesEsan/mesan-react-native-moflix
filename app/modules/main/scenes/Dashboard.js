@@ -2,7 +2,8 @@ import React, { useEffect, useLayoutEffect, useMemo } from 'react';
 import { SafeAreaView, ActivityIndicator, ScrollView, RefreshControl, StyleSheet } from 'react-native';
 
 // NAVIGATION
-import { useNavigation, useRoute } from "@react-navigation/native";
+// useRoute
+import { useNavigation } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
 import { FilterView } from "react-native-filter-component";
@@ -14,7 +15,7 @@ import useFetch from '../hooks/useFetch';
 import { useModuleContext } from "../core/Provider";
 
 // SERVICES
-import { getSections, getDashboard } from "../core/Service";
+import { getSections, getPanels } from "../core/Service";
 
 // COMPONENTS
 import ModuleItem from "../components/ModuleItem";
@@ -38,14 +39,9 @@ export default function Dashboard({ }) {
     const [
         //page, nextPage, totalResults, isFetchingNextPage
         { data, error, isFetching, isRefreshing },
-        //  setPage, setNextPage, setTotalResults, setIsRefreshing, setIsFetchingNextPage, setAPIResponse
-        { setData, setError, setIsFetching, setLoadingState }
+        //  setPage, setNextPage, setTotalResults, setIsFetchingNextPage, setAPIResponse
+        { setData, setError, setIsFetching, setIsRefreshing, setLoadingState }
     ] = useFetch();
-
-    // ROUTE PARAMS
-    // If the section was passed as a Route parameter
-    // const route = useRoute();
-    // const section = route.params?.section;
 
     //========================================================================================
     //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
@@ -93,7 +89,7 @@ export default function Dashboard({ }) {
 
     useEffect(() => {
         (async () => {
-            if (section) await getData(false, { 'section': section.id });
+            if (section) await getData();
         })();
     }, [section]);
 
@@ -105,11 +101,10 @@ export default function Dashboard({ }) {
 
             // get the sections
             let response = await getSections();
-            let sections = response?.sections;
 
             // set the sections and the first section as the selected section
-            setSections(sections);
-            setSection(sections[0])
+            setSections(response?.data || []);
+            setSection(response ? response.data[0] : null)
         } catch (error) {
             setError(error.message);
         } finally {
@@ -124,15 +119,30 @@ export default function Dashboard({ }) {
             setLoadingState(!refresh, refresh);
 
             // pass the selected section to the params instead
-            // if (section) params = { ...params, 'section': section.id }
-            let response = await getDashboard(params)
+            if (section) params = { ...params, 'section_id': section.id }
+            let response = await getPanels(params)
 
             // set the data
-            setData(response);
+            setData(response?.panels || []);
+            setError(null);
         } catch (error) {
             setError(error.message);
         } finally {
             setLoadingState(false, false);
+        }
+    }
+
+    // 2c - REFRESH DATA
+    async function refetchData() {
+        setIsRefreshing(true);
+        await getData(true);
+    }
+
+    // 2d - FETCH NEXT PAGE
+    async function fetchNextPage() {
+        if (nextPage) {
+            setIsFetchingNextPage(true);
+            await getData(false, more = true);
         }
     }
 
@@ -146,7 +156,7 @@ export default function Dashboard({ }) {
 
     // 3d - RENDER ERROR
     const renderError = () => {
-        return <ErrorView message={error} onPress={() => getData(false)} />
+        return <ErrorView message={error} onPress={getData} />
     }
 
     // 3e - RENDER LOADING
@@ -179,7 +189,6 @@ export default function Dashboard({ }) {
             ctaTextStyle: { color: colors.text },
             onPress: onPanelViewAllPress,
             renderItem: renderPanelItem
-
         }
         return data.map(panel => ({ ...panel, ...sharedPanelProps }));
     }, [data]);
@@ -198,14 +207,13 @@ export default function Dashboard({ }) {
     }
 
     //5c - SCROLLVIEW PROPS
-    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={() => getData(true)} />
+    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refetchData} />
     const scrollViewProps = {
         horizontal: false,
         showsHorizontalScrollIndicator: false,
         refreshControl: refreshControl,
         contentContainerStyle: { flexGrow: 1 },
     }
-
     // ========================================================================================
     // 6 - RENDER VIEW
     //=========================================================================================
@@ -234,5 +242,4 @@ const filterViewStyles = StyleSheet.create({
         color: "white",
         fontWeight: "500"
     },
-
 });
