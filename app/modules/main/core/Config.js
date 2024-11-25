@@ -7,7 +7,7 @@ export const colors = {
 }
 
 // 2 - API URL AND ENDPOINTS
-export const CRUD_API_URL = "https://mesan-moflix-app-c00e8823b683.herokuapp.com/"
+export const CRUD_API_URL = "https://mesan-moflix-app-c00e8823b683.herokuapp.com/v2/"
 export const SECTIONS_ENDPOINT = 'sections/'
 export const PANELS_ENDPOINT = 'panels/'
 
