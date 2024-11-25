@@ -5,7 +5,7 @@ import { SafeAreaView, FlatList } from 'react-native';
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
-import { useCRUD, DataStatusView, NavBackButton } from "react-native-helper-views";
+import { useCRUD, DataStatusView, NavBackButton, CustomNavTitle } from "react-native-helper-views";
 
 // SERVICES
 import { } from "../core/Service";
@@ -46,7 +46,8 @@ export default function Favorites(props) {
     //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: "Favorites",
+            headerTitle: "",
+            headerLeft: () => <CustomNavTitle title={"Favorites"} style={{ width: 150, paddingLeft: 14 }} titleStyle={{ color: colors.text, fontSize: 21 }} />,
             // headerRight: () => <NavButtons buttons={navButtons} />,
             // headerLeft: () => <NavBackButton onPress={navigation.goBack} />, // If using a custom back button
         });
