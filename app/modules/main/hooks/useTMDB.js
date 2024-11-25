@@ -39,6 +39,9 @@ const useTMDB = (item) => {
     date = new Date(date);
     date = moment(date).format("MMM Do YYYY");
 
+    // extract the year from the date
+    const year = date.split(' ')[2];
+
     // loop throught he season add add the series_id
     seasons.map(season => season.series_id = item.id)
     return { 
@@ -52,7 +55,7 @@ const useTMDB = (item) => {
         videos, cast,
         release_date,
         first_air_date,
-        date
+        date, year
     }
 }
 
