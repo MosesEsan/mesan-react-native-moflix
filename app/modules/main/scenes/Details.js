@@ -12,20 +12,17 @@ import { ErrorView } from "react-native-helper-views";
 
 // HOOKS
 import useFetch from '../hooks/useFetch';
-import useFavorites from '../hooks/useFavorites';
 import useTMDB from '../hooks/useTMDB';
 
 // SERVICES
 import { getDetails } from '../core/Service';
 
 // COMPONENTS
+import Header from '../components/Header';
 import DetailItem from "../components/DetailItem";
 
 // CONFIG
 import { colors } from "../core/Config"
-
-// STYLES
-// import { styles } from "../../../styles";
 
 export default function Details(props) {
     // 1 - DECLARE VARIABLES
@@ -35,9 +32,6 @@ export default function Details(props) {
     // ROUTE PARAMS
     const route = useRoute();
     const item = route.params?.item;
-
-    // FAVORITES CONTEXT
-    const { favorites, isFavorite, toggleFavorite } = useFavorites();
 
     // LOADING STATE AND ERROR
     const [
@@ -53,19 +47,12 @@ export default function Details(props) {
     //1B -NAVIGATION CONFIG
     useLayoutEffect(() => {
         // const navButtons = [
-        //     {
-        //         onPress: () => onToggle(),
-        //         name: isItemFavorite ? "star" : "staro",
-        //         type: "antdesign",
-        //         color: "#fff",
-        //         style: { paddingLeft: 5 }
-        //     }
+        //     {onPress: () => onToggle(), name: isItemFavorite ? "star" : "staro", type: "antdesign", color: "#fff", style: { paddingLeft: 5 }}
         // ];
         navigation.setOptions({
-            headerTitle: "",
-            // headerTitle: item.name || item.title || "Details",
-            // headerLeft: () => <NavBackButton/>,
-            // headerRight: () => <NavButtons buttons={navButtons} />,
+            headerTitle: "", //item.name || item.title || "Details",
+            // headerLeft: null,
+            headerRight: () => <NavCloseButton onPress={() => navigation.goBack()} />, //<NavButtons buttons={navButtons} />,
         });
     }, [navigation]);
 
@@ -155,9 +142,7 @@ export default function Details(props) {
     //3a - RENDER SCROLLVIEW VIEW CONTENT
     const renderScrollViewContent = () => {
         if (isFetching) return <ActivityIndicator style={[{ flex: 1 }]} />;
-
         if (error) return <ErrorView message={error} />;
-
         return (
             <View style={[]}>
                 <DetailItem type={'header'} item={data} />
@@ -172,15 +157,6 @@ export default function Details(props) {
     // ==========================================================================================
     //5 -  ACTION HANDLERS
     //==========================================================================================
-    const isItemFavorite = useMemo(() => {
-        return isFavorite(item);
-    }, [favorites]);
-
-    const onToggle = () => {
-        toggleFavorite(item);
-        // create({ ...item, date: "blahblah" })
-    }
-
     // const onUpdate = (item, newData) => {
     //     update(item.id, newData)
     // }
@@ -191,9 +167,11 @@ export default function Details(props) {
 
     //==========================================================================================
     // 6 - RENDER VIEW
+    //==========================================================================================
     const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={() => getData(true)} />
     return (
         <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
+            <Header item={item} />
             <ScrollView
                 contentContainerStyle={[{ backgroundColor: colors.primary }]}
                 refreshControl={refreshControl}>
