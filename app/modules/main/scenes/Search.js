@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { Text, SafeAreaView, ActivityIndicator, FlatList, StyleSheet, View, Pressable, Platform } from 'react-native';
+import React, { useLayoutEffect, useMemo, useEffect, useState } from 'react';
+import { SafeAreaView, ActivityIndicator, FlatList, StyleSheet, View, ScrollView, Platform, RefreshControl } from 'react-native';
 
 // NAVIGATION
 import { useNavigation } from "@react-navigation/native";
@@ -7,13 +7,14 @@ import { useNavigation } from "@react-navigation/native";
 // 3RD PARTY COMPONENTS
 import axios from 'axios';
 import { EmptyView, ErrorView, CustomNavTitle } from "react-native-helper-views";
+import { PanelContainer } from "mesan-react-native-panel";
 import { SearchBar } from '@rneui/themed';
 
 // HOOKS
 import useFetch from '../hooks/useFetch';
 
 // SERVICES
-import { searchByName } from "../core/Service";
+import { getAllCategories, searchByName } from "../core/Service";
 
 // COMPONENTS
 import ModuleItem from "../components/ModuleItem";
@@ -30,10 +31,11 @@ export default function Search(props) {
     const [searchValue, setSearchValue] = useState("");
     const [searchType, setSearchType] = useState(null);
     const [cancelToken, setCancelToken] = useState('');
+    const [categories, setCategories] = useState([]);
 
-    const [
+    const [       
         { data, error, page, nextPage, totalResults, isFetching, isRefreshing, isFetchingNextPage },
-        { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setIsFetchingNextPage, setAPIResponse }
+        { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setLoadingState, setIsFetchingNextPage, setAPIResponse }
     ] = useFetch();
 
     //==================================================================================================
@@ -41,20 +43,48 @@ export default function Search(props) {
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: "",
-            headerStyle: { backgroundColor: "#000", borderBottomColor: "rgb(18,18,20)", shadowColor: "rgb(26,26,26)" },
-            // headerLeft: () => <CustomNavTitle title={"Search"} style={{ flex: 1, width: 200 }} titleStyle={{ color: "#fff" }} />,
+            headerLeft: () => <CustomNavTitle title={"Search"} style={{ width: 200, paddingLeft: 14 }} titleStyle={{ color: colors.text, fontSize: 21 }} />,
         });
     }, [navigation]);
 
-    // ==========================================================================================
+
+    //==========================================================================================
     // 2 - MAIN CODE BEGINS HERE
+    // ==========================================================================================
+    // 2A - USE EFFECT - GET CATEGORIES
+    useEffect(() => {
+        (async () => await _getCategories())();
+    }, []);
+
+    // 2A - USE EFFECT - SEARCH
     useEffect(() => {
         if (searchValue.length > 0) (async () => await search(searchValue, page))();
         else setData([]);
     }, [searchValue]);
 
-    //2b - GET DATA
-    async function search(query=searchValue, page = 1, more = false) {
+    // 2B - GET CAEGORIES
+    async function _getCategories(refresh=false, params = {}) {
+        try {
+            // set the loading state
+            setLoadingState(!refresh, refresh);
+
+            let response = await getAllCategories(params);
+            const panels = Object.entries(response).map(([key, data]) => {
+                // convert the key to title case
+                let title = key.replace(/\b\w/g, l => l.toUpperCase());
+                return ({ title: `${title} Categories`, data, type: "grid" })
+        });
+            setCategories(panels || [])
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoadingState(false, false);
+            setIsFetchingNextPage(false);
+        }
+    }
+
+    //2B - GET DATA
+    async function search(query = searchValue, page = 1, more = false) {
         if (!more) setIsFetching(true);
 
         // Cancel the previous request before making a new request
@@ -79,20 +109,52 @@ export default function Search(props) {
         }
     }
 
-    // 2c - FETCH NEXT PAGE
+    // 2C - REFRESH DATA
+    async function refetchData() {
+        setIsRefreshing(true);
+        await _getCategories(true);
+    }
+
+    // 2D - FETCH NEXT PAGE
     async function fetchNextPage() {
         if (nextPage) {
             setIsFetchingNextPage(true);
-            search(searchValue, nextPage, more = true);
+            await search(searchValue, nextPage, more = true);
         }
     }
 
+    // ==========================================================================================
+    //4 -  ACTION HANDLERS
+    //==========================================================================================
+    // If using Infinite Scroll - Load More Data
+    function onEndReached() {
+        if (!isFetching && !isFetchingNextPage && nextPage) {
+            fetchNextPage()
+        }
+    }
+
+    // ON CLOSE
+    const onClose = () => {
+        navigation.goBack();
+    }
+
+    // LIST DATA
+    const listData = useMemo(() => {
+        if (searchValue.length === 0) return categories
+        return data;
+        // return data && data.pages.map(page => {
+        //     if (page?.results) return page.data;
+        //     return []
+        // }).flat()
+    }, [searchValue, data, categories])
+
     //==============================================================================================
-    //3 -  UI ACTION HANDLERS
+    //5 -  UI ACTION HANDLERS
     //==============================================================================================
     //3a - RENDER ITEM
     const renderItem = ({ item, index }) => {
-        return <ModuleItem type={'media-grid'} item={item} />
+        let type = (searchValue.length === 0) ? 'category-grid' : 'media-grid';
+        return <ModuleItem type={type} item={item} key={`search_item_${index}`} />
     }
 
     //3b - RENDER EMPTY
@@ -109,44 +171,43 @@ export default function Search(props) {
         ) : null;
     };
 
-    //3d - RENDER HEADER
-    const renderHeader = () => {
-        return (
-            <View> <Text>HEADER</Text></View>
-        )
-    };
-
-    // 3e - RENDER ERROR
+    // 3d - RENDER ERROR
     const renderError = () => {
         return <ErrorView message={error} onPress={search} />
     }
 
-    // 3f - RENDER LOADING
+    // 3e - RENDER LOADING
     const renderLoading = () => {
         return <ActivityIndicator style={{ backgroundColor: colors.primary, flex: 1 }} />
     }
 
-    // ==========================================================================================
-    //4 -  ACTION HANDLERS
-    //==========================================================================================
-    // If using Infinite Scroll - Load More Data
-    const onEndReached = () => (!isFetching && !isFetchingNextPage && nextPage) && fetchNextPage()
-
-    // ON CLOSE
-    const onClose = () => {
-        navigation.goBack();
+    // 3f - RENDER VIEW
+    const renderView = () => {
+        if (!isFetching && !error) {
+            if (searchValue.length === 0) {
+                return (
+                    <ScrollView {...scrollViewProps}>
+                        <PanelContainer data={panels} />
+                    </ScrollView>
+                )
+            }
+            return <FlatList {...listProps} />;
+        }
+        return null;
     }
 
     // ==========================================================================================
+    // 5 - VIEW PROPS
     //==========================================================================================
+    //5a - FLATLIST PROPS
     const listProps = {
-        data: data,
-        extraData: data,
+        data: listData,
+        extraData: listData,
         initialNumToRender: 10,
         numColumns: 3,
 
         style: { backgroundColor: colors.primary },
-        contentContainerStyle: { flexGrow: 1 },
+        contentContainerStyle: { flexGrow: 1, paddingHorizontal:10},
 
         renderItem: renderItem,
         ListEmptyComponent: renderEmpty,
@@ -159,33 +220,56 @@ export default function Search(props) {
         ListFooterComponent: renderFooter
     }
 
+    //5b - PANEL PROPS
+    const panels = useMemo(() => {
+        const sharedPanelProps = {
+            containerStyle: { marginBottom: 15 },
+            headerStyle: { color: colors.text, fontWeight: "500" },
+            ctaTextStyle: { color: colors.text },
+            // onPress: onPanelViewAllPress,
+            renderItem,
+        }
+        return categories.map(panel => ({ ...panel, ...sharedPanelProps }));
+    }, [categories, searchValue]);
+
+    //5c - SCROLLVIEW PROPS
+    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refetchData} />
+    const scrollViewProps = {
+        horizontal: false,
+        showsHorizontalScrollIndicator: false,
+        refreshControl: refreshControl,
+        contentContainerStyle: { flexGrow: 1,  }
+    }
+
+    // ==========================================================================================
+    // 6 - RENDER VIEW
+    //==========================================================================================
     return (
-        <SafeAreaView style={[styles.container]}>
-            <SearchBarContainer searchValue={searchValue} onChangeText={setSearchValue} onClose={onClose} />
-            {/* //If using Flatlist */}
+        <SafeAreaView style={[{ flex: 1, backgroundColor: colors.primary }]}>
+            <SearchBarContainer searchValue={searchValue} onChangeText={setSearchValue} onClose={onClose} placeholder={"Search by title"} />
             {(isFetching && !isFetchingNextPage) && renderLoading()}
             {(error) && renderError()}
-            {(!isFetching && !error) && <FlatList {...listProps} />}
+            {renderView()}
         </SafeAreaView>
     );
 };
 
-const SearchBarContainer = ({ searchValue, onChangeText, onClose }) => {
+const SearchBarContainer = ({ searchValue, onChangeText, onClose, placeholder = "Type Here..." }) => {
     return (
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", paddingHorizontal: 4 }}>
             <SearchBar
                 value={searchValue}
-                placeholder="Type Here..."
+                placeholder={placeholder}
                 onChangeText={onChangeText}
                 placeholderTextColor={"#fff"}
                 inputStyle={styles.inputStyle}
-                containerStyle={styles.containerStyle}
+                containerStyle={{flex: 1, backgroundColor: colors.primary, borderTopWidth:0, borderBottomWidth:0}}
                 inputContainerStyle={styles.inputContainerStyle}
                 showCancel={true}
                 autoFocus={false} />
-            <Pressable onPress={onClose} style={styles.cancelButton}>
+            {/* <Pressable onPress={onClose} style={styles.cancelButton}>
                 <Text style={styles.cancelText}>Cancel</Text>
-            </Pressable>
+            </Pressable> */}
         </View>
     );
 }
@@ -199,12 +283,12 @@ const styles = StyleSheet.create({
     containerStyle: {
         flex: 1,
         backgroundColor: "#000",
-        paddingVertical: 6, 
+        paddingVertical: 6,
     },
 
     inputContainerStyle: {
-        height: 34,
-        borderRadius: 10,
+        height: 44,
+        borderRadius: 12,
         backgroundColor: "rgb(28,28,31)"
     },
 
