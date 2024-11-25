@@ -88,7 +88,7 @@ export default function List(props) {
         navigation.setOptions({
             headerTitle: panel?.title || category?.name || route.params?.title || "",
             // headerRight: () => <NavButtons buttons={navButtons} />,
-            // headerLeft: () => <NavBackButton onPress={navigation.goBack} />, // If using a custom back button
+            headerLeft: () => <NavBackButton onPress={navigation.goBack} />, // If using a custom back button
         });
     }, [navigation]);
 
@@ -130,7 +130,7 @@ export default function List(props) {
             page: page,
             with_genres: category.id
         }
-        return await getByCategory(section.slug, params)
+        return await getByCategory(category?.media_type || section.slug, params)
     }
 
     // 2d - GET EPISODES
