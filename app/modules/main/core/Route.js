@@ -10,6 +10,9 @@ import FavoritesScreen from '../scenes/Favorites';
 import SearchScreen from '../scenes/Search';
 import CreditsScreen from '../scenes/Credits';
 
+// EXPORT THE SCREEN SHARED BY MULTIPLE SECTION, E.G. The Favorites screen will need access to the Details Screen
+export { SearchScreen, FavoritesScreen, ListScreen, DetailsScreen, CreditsScreen, MediaPlayer };
+
 // CONFIG
 import { colors } from './Config';
 
@@ -19,31 +22,27 @@ export const scenes = [
     name: "Dashboard",
     component: DashboardScreen
   },
-  {
-    name: "List",
-    component: ListScreen
-  },
-  {
-    name: "Details",
-    component: DetailsScreen
-  },
-  {
-    name: "Favorites",
-    component: FavoritesScreen
-  },
-  {
-    name: "MediaPlayer",
-    component: MediaPlayer
-  },
-  {
-    name: "Credits",
-    component: CreditsScreen
-  }
+  // {
+  //   name: "List",
+  //   component: ListScreen
+  // },
+  // {
+  //   name: "Details",
+  //   component: DetailsScreen
+  // },
+  // {
+  //   name: "Favorites",
+  //   component: FavoritesScreen
+  // },
+  // {
+  //   name: "Search",
+  //   component: SearchScreen
+  // },
 ]
+
 
 // 2 - NAVIGATION PROPS
 const navigatorProps = {
-  initialRouteName: "Home",
   screenOptions: {
     headerStyle: {
       borderBottomWidth: 0,
@@ -59,30 +58,12 @@ const navigatorProps = {
 
 // 2 - STACK NAVIGATOR
 const Stack = createStackNavigator();
-function MainStackScreen() {
+
+// 3 - MAIN STACK
+export default function MainStackScreen() {
   return (
     <Stack.Navigator {...navigatorProps} initialRouteName={scenes[0].name}>
-      {
-        scenes.map((scene, index) => {
-          return (
-            <Stack.Screen
-              key={index}
-              name={scene.name}
-              component={scene.component}
-              options={{ title: scene.name }}
-            />
-          )
-        })
-      }
-    </Stack.Navigator>
-  );
-}
-
-export default function ModuleStack() {
-  return (
-    <Stack.Navigator {...navigatorProps} initialRouteName={"Main"} mode="modal">
-      <Stack.Screen name="Main" component={MainStackScreen} options={{ headerShown: false }} />
-      <Stack.Screen name={"Search"} component={SearchScreen} options={{ title: "Search", headerShown: false }} />
+      {scenes.map((scene, index) => (<Stack.Screen key={index} name={scene.name} component={scene.component} options={{ title: scene.name }} />))}
     </Stack.Navigator>
   );
 }
