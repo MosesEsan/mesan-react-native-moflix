@@ -9,7 +9,7 @@ import { Icon } from '@rneui/themed';
 
 // HOOKS
 import useTMDB from '../hooks/useTMDB';
-import useFavorites from '../hooks/useFavorites';
+import { useFavoriteContext } from "../providers/FavoriteProvider";
 
 // CONFIG
 import { colors, IMAGE_URL, LARGE_IMAGE_URL, YOUTUBE_URL } from "../core/Config"
@@ -31,7 +31,7 @@ function HeaderItem({ item }) {
     // 1 - DECLARE VARIABLES
     // HOOKS
     const { backdrop_path } = useTMDB(item);
-    const { favorites, isFavorite, toggleFavorite } = useFavorites();
+    const { favorites, isFavorite, toggleFavorite } = useFavoriteContext();
 
     // ==========================================================================================
     // 2 - ACTION HANDLERS

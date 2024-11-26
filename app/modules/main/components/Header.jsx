@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Icon } from '@rneui/themed';
 
 // HOOKS
-// import useFavorites from '../hooks/useFavorites';
+// import { useFavoriteContext } from "../core/FavoriteProvider";
 
 // CONFIG
 import { colors } from "../core/Config"
@@ -16,7 +16,7 @@ import { colors } from "../core/Config"
 export default function Header({ item }) {
     // NAVIGATION HOOKS
     const navigation = useNavigation();
-    // const { favorites, isFavorite, toggleFavorite } = useFavorites();
+    // const { favorites, isFavorite, toggleFavorite } = useFavoriteContext();
 
     // ==========================================================================================
     // 2 - ACTION HANDLERS

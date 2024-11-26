@@ -6,7 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 
 // HOOKS
 import useTMDB from '../hooks/useTMDB';
-// import useFavorites from '../hooks/useFavorites';
+// import { useFavoriteContext } from "../core/FavoriteProvider";
 
 // CONFIG
 import { colors, YOUTUBE_URL } from "../core/Config"
@@ -18,7 +18,7 @@ export default function SpotlightItem({ item }) {
 
     // HOOKS
     const { genresString, year, director, creators } = useTMDB(item);
-    // const { favorites, isFavorite, toggleFavorite } = useFavorites();
+    // const { favorites, isFavorite, toggleFavorite } = useFavoriteContext();
 
     // ==========================================================================================
     // 2 - ACTION HANDLERS
