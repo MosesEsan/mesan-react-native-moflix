@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
 import { FilterView } from "react-native-filter-component";
-import { EmptyView, ErrorView, NavButtons, CustomNavTitle } from "react-native-helper-views";
+import { NavButtons, NavBackButton, ErrorView, EmptyView } from "react-native-helper-views";
 
 // HOOKS
 import useFetch from '../hooks/useFetch';
@@ -52,6 +52,16 @@ export default function Credits(props) {
         //  setPage, setNextPage, setTotalResults, setIsFetchingNextPage, setAPIResponse
         { setData, setError, setIsFetching, setIsRefreshing, setLoadingState }
     ] = useFetch();
+    
+    //========================================================================================
+    //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: "Credits",
+            // headerRight: () => <NavButtons buttons={navButtons} />,
+            headerLeft: () => <NavBackButton onPress={navigation.goBack} />, // If using a custom back button
+        });
+    }, [navigation]);
 
     //==========================================================================================
     // 2 - MAIN CODE BEGINS HERE
