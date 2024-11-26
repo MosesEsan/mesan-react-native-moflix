@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
 // Panel,
-import { PanelContainer } from 'mesan-react-native-panel';  
+import { PanelContainer } from 'mesan-react-native-panel';
 // , NavBackButton, NavButtons
 import { ErrorView } from "react-native-helper-views";
 
@@ -129,7 +129,7 @@ export default function Details(props) {
             p['headerStyle'] = { color: colors.text, fontWeight: "500" };
             p['ctaTextStyle'] = { color: colors.text };
             // if the data length is greater than 0, update the renderItem function
-            if (p.data.length > 0)  p['renderItem'] = (props) => <DetailItem {...props} type={p?.itemType} size={p?.itemSize} />
+            if (p.data.length > 0) p['renderItem'] = (props) => <DetailItem {...props} type={p?.itemType} size={p?.itemSize} />
             else panels = panels.filter(panel => panel.id !== p.id); // remove the panel
         })
 
@@ -148,22 +148,21 @@ export default function Details(props) {
                 <DetailItem type={'header'} item={data} />
                 <View style={{ flex: 1 }}>
                     <DetailItem type={'main'} item={data} />
-                    <PanelContainer data={panels}/>
+                    <PanelContainer data={panels} />
                 </View>
             </View>
         )
     }
 
-    // ==========================================================================================
-    //5 -  ACTION HANDLERS
-    //==========================================================================================
-    // const onUpdate = (item, newData) => {
-    //     update(item.id, newData)
-    // }
+    // 3d - RENDER ERROR
+    const renderError = () => {
+        return <ErrorView message={error} onPress={getData} />
+    }
 
-    // const onDelete = (item) => {
-    //     destroy(item.id)
-    // }
+    // 3e - RENDER LOADING
+    const renderLoading = () => {
+        return <ActivityIndicator style={{ backgroundColor: colors.primary, flex: 1 }} />
+    }
 
     //==========================================================================================
     // 6 - RENDER VIEW
@@ -175,7 +174,15 @@ export default function Details(props) {
             <ScrollView
                 contentContainerStyle={[{ backgroundColor: colors.primary }]}
                 refreshControl={refreshControl}>
-                {renderScrollViewContent()}
+                {(isFetching) ? renderLoading() : (error) ? renderError() : (
+                    <View style={[]}>
+                        <DetailItem type={'header'} item={data} />
+                        <View style={{ flex: 1 }}>
+                            <DetailItem type={'main'} item={data} />
+                            <PanelContainer data={panels} />
+                        </View>
+                    </View>
+                )}
             </ScrollView>
         </SafeAreaView>
     );

@@ -9,7 +9,7 @@ import { NavButtons, NavBackButton, ErrorView, EmptyView } from "react-native-he
 import { useInfiniteQuery } from '@tanstack/react-query'
 
 // HOOKS
-import useFetch from '../hooks/useFetch';
+// import useFetch from '../hooks/useFetch';
 import { useModuleContext } from "../core/Provider";
 
 // SERVICES
@@ -75,13 +75,10 @@ export default function List(props) {
         },
     });
 
-    // const [
-    //     //page, nextPage, totalResults, isFetchingNextPage
-    //     { data, error, isFetching, isRefreshing },
-    //     //  setPage, setNextPage, setTotalResults, setIsRefreshing, setIsFetchingNextPage, setAPIResponse
-    //     { setData, setError, setIsFetching, setLoadingState }
+    // const [       
+    //     { data, error, page, nextPage, totalResults, isFetching, isRefreshing, isFetchingNextPage },
+    //     { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setLoadingState, setIsFetchingNextPage, setAPIResponse }
     // ] = useFetch();
-
     //========================================================================================
     //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
     useLayoutEffect(() => {
@@ -158,7 +155,6 @@ export default function List(props) {
     const renderItem = ({ item, index }) => {
         // if displaying the data for a specific panel and the panel media_type is "category"
         // render the GridCategoryItem
-        // alert(JSON.stringify(JSON.stringify(panel)))
         if (panel && panel?.item_type === "category") return <ModuleItem type={'category-grid'} item={item} />
 
         if (scene) return <DetailItem type={scene} item={item} />
@@ -207,7 +203,7 @@ export default function List(props) {
             // if the key is episodes, use it else return the data
             if (page?.results) return page.results;
             if (page?.episodes) return page.episodes;
-            if (page?.genres) return page.genres; 
+            if (page?.genres) return page.genres;
             if (page?.data) return page.data;
             return []
         }).flat()
@@ -242,12 +238,11 @@ export default function List(props) {
     // ==========================================================================================
     // 6 - RENDER VIEW
     //==========================================================================================
-    if (isFetching && !isFetchingNextPage) return renderLoading();
-    if (error) return renderError();
     return (
         <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
-            {/* //If using Flatlist */}
-            <FlatList {...listProps} />
+            {(isFetching && !isFetchingNextPage) ? renderLoading() : (error) ? renderError() : (
+                <FlatList {...listProps} />
+            )}
         </SafeAreaView>
     );
 };
