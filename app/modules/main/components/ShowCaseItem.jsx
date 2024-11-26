@@ -128,7 +128,7 @@ export default function ShowCaseItem(props) {
             <View style={[styles.container]}>
                 {renderImage()}
                 <View style={[styles.metaContainer, { paddingBottom: 30 }]}>
-                    <Text style={styles.title}>{item?.name}</Text>
+                    <Text style={styles.title}>{item?.title || item?.name}</Text>
                     {genresString && <Text style={styles.subtitle}>{`${genresString}`}</Text>}
                     {item?.overview && <Text style={styles.description} numberOfLines={3}>{item.overview}</Text>}
                 </View>
