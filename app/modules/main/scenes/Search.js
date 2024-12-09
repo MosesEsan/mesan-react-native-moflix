@@ -34,7 +34,7 @@ export default function Search(props) {
     const [categories, setCategories] = useState([]);
 
     const [       
-        { data, error, page, nextPage, totalResults, isFetching, isRefreshing, isFetchingNextPage },
+        { data, error, page, nextPage:hasNextPage, totalResults, isFetching, isRefreshing, isFetchingNextPage },
         { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setLoadingState, setIsFetchingNextPage, setAPIResponse }
     ] = useFetch();
 
@@ -138,16 +138,6 @@ export default function Search(props) {
         navigation.goBack();
     }
 
-    // LIST DATA
-    const listData = useMemo(() => {
-        if (searchValue.length === 0) return categories
-        return data;
-        // return data && data.pages.map(page => {
-        //     if (page?.results) return page.data;
-        //     return []
-        // }).flat()
-    }, [searchValue, data, categories])
-
     //==============================================================================================
     //5 -  UI ACTION HANDLERS
     //==============================================================================================
@@ -200,6 +190,16 @@ export default function Search(props) {
     // 5 - VIEW PROPS
     //==========================================================================================
     //5a - FLATLIST PROPS
+    // LIST DATA
+    const listData = useMemo(() => {
+        if (searchValue.length === 0) return categories
+        return data;
+        // return data && data.pages.map(page => {
+        //     if (page?.results) return page.data;
+        //     return []
+        // }).flat()
+    }, [searchValue, data, categories])
+
     const listProps = {
         data: listData,
         extraData: listData,

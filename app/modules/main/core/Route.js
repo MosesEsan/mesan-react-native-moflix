@@ -56,11 +56,9 @@ const navigatorProps = {
   },
 }
 
-// 2 - STACK NAVIGATOR
-const Stack = createStackNavigator();
-
 // 3 - MAIN STACK
 export default function MainStackScreen() {
+  const Stack = createStackNavigator();
   return (
     <Stack.Navigator {...navigatorProps} initialRouteName={scenes[0].name}>
       {scenes.map((scene, index) => (<Stack.Screen key={index} name={scene.name} component={scene.component} options={{ title: scene.name }} />))}
