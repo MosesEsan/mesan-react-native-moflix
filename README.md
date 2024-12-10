@@ -4,9 +4,9 @@ MoFlix is a Netflix Semi-Clone iOS mobile application built with React Native, u
 **Version 1.1**
 Scroll down to view previous versions
 
-![Screenshot 1](https://github.com/MosesEsan/mesan-react-native-moflix/blob/main/assets/screenshots/v11merged.jpg?raw=true)
+![Screenshot 1](https://github.com/MosesEsan/mesan-react-native-moflix/blob/main/assets/screenshots/v11merged.png?raw=true)
 
-![Screenshot 2](https://github.com/MosesEsan/mesan-react-native-moflix/blob/main/assets/screenshots/v11merged(2).jpg?raw=true)
+![Screenshot 2](https://github.com/MosesEsan/mesan-react-native-moflix/blob/main/assets/screenshots/v11merged(2).png?raw=true)
 
 The custom API handles the returning of the dashboard panels and allows the creating of new panels for each section, the TMDB API takes care of retrieving the movies and tv shows details. 
 
