@@ -55,6 +55,26 @@ export async function getCategories(section, params) {
     return await apiCall(`${TMDB_API_URL}genre/${section}/list`, params, HEADERS);
 }
 
+
+export async function getAllCategories() {
+    const urls =  [
+        axios.get(`${TMDB_API_URL}genre/movie/list`, HEADERS),
+        axios.get(`${TMDB_API_URL}genre/tv/list`, HEADERS),
+    ];
+    try {
+        let response = {};
+        const res = await axios.all(urls);
+        res.forEach((result, idx) => {
+            let key  = idx === 0 ? 'movie' : 'tv';
+            response[key] = result.data.genres.map(item => ({...item, media_type: key}));
+        });
+        return response;
+    } catch (error) {
+        return { error: error.message };
+    }
+}
+
+
 // GET CATEGORY DATA - READ
 export async function getByCategory(section, params) {
     return await apiCall(`${TMDB_API_URL}${DISCOVER_ENDPOINT}/${section}`, params, HEADERS);

@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
 import { FilterView } from "react-native-filter-component";
-import { EmptyView, ErrorView, NavButtons, CustomNavTitle } from "react-native-helper-views";
+import { NavBackButton, ErrorView, EmptyView } from "react-native-helper-views";
 
 // HOOKS
 import useFetch from '../hooks/useFetch';
@@ -20,21 +20,16 @@ import DetailItem from "../components/DetailItem";
 // CONFIG
 import { colors } from "../core/Config"
 
-// STYLES
-// import { styles } from "../styles";
-
 // FILTER VIEW DATA
 const SECTIONS = [
     { id: 1, name: "Cast" },
     { id: 2, name: "Crew" }
 ]
 
-export default function Credits(props) {
+export default function Credits() {
     //1 - DECLARE VARIABLES
     // NAVIGATION
     const navigation = useNavigation();
-
-    // HOOKS
 
     // ROUTE PARAMS
     // If the data was passed as a Route parameter
@@ -42,16 +37,23 @@ export default function Credits(props) {
     const item = route.params?.item;
 
     // FILTER VIEW VARIABLES
-    // const [sections, setSections] = useState([]);
     const [section, setSection] = useState(SECTIONS[0]);
 
     // LOADING STATE AND ERROR
     const [
-        //page, nextPage, totalResults, isFetchingNextPage
         { data, error, isFetching, isRefreshing },
-        //  setPage, setNextPage, setTotalResults, setIsFetchingNextPage, setAPIResponse
-        { setData, setError, setIsFetching, setIsRefreshing, setLoadingState }
+        { setData, setError, setLoadingState }
     ] = useFetch();
+    
+    //========================================================================================
+    //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerTitle: "Credits",
+            // headerRight: () => <NavButtons buttons={navButtons} />,
+            headerLeft: () => <NavBackButton onPress={navigation.goBack} />, // If using a custom back button
+        });
+    }, [navigation]);
 
     //==========================================================================================
     // 2 - MAIN CODE BEGINS HERE
@@ -101,13 +103,6 @@ export default function Credits(props) {
         return <EmptyView title={"No Data."} message={"No data to show"} {...textProps} />
     };
 
-    //3c - RENDER FOOTER
-    // const renderFooter = () => {
-    //     return hasNextPage && isFetchingNextPage ? (
-    //         <ActivityIndicator size="small" color={colors.text} style={{ height: 50 }} />
-    //     ) : null;
-    // };
-
     // 3d - RENDER ERROR
     const renderError = () => {
         return <ErrorView message={error} onPress={() => getData(false)} />
@@ -126,13 +121,10 @@ export default function Credits(props) {
         setSection(selected);
     };
 
-    // If using Infinite Scroll - Load More Data
-    // let onEndReached = () => !isFetching && fetchNextPage()
-
     // ==========================================================================================
-    // 5 - RENDER VIEW
+    // 5 - VIEW PROPS
     //==========================================================================================
-    // FILTER VIEW PROPS
+    //5a - FILTERVIEW PROPS
     const filterViewProps = {
         data: SECTIONS,
         misc: section ? [section] : [],
@@ -155,17 +147,11 @@ export default function Credits(props) {
 
         keyExtractor: (item, index) => `item_${item['id'].toString()}${index.toString()}`,
         refreshing: isRefreshing,
-        onRefresh: () => getData(true),
-
-        // If using Infinite Scroll
-        // onEndReached,
-        // onEndReachedThreshold: 0,
-        // ListFooterComponent: renderFooter
+        onRefresh: () => getData(true)
     }
 
     return (
         <SafeAreaView style={[{ flex: 1, backgroundColor: colors.primary }]}>
-            {/* If using the the filter view */}
             <FilterView {...filterViewProps} />
             {(isFetching) ? renderLoading() : (error) ? renderError() : (
                 <FlatList {...listProps} />

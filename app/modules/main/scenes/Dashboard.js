@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo } from 'react';
-import { SafeAreaView, ActivityIndicator, ScrollView, RefreshControl, StyleSheet } from 'react-native';
+import { SafeAreaView, ActivityIndicator, ScrollView, RefreshControl, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 // NAVIGATION
 // useRoute
@@ -23,9 +23,6 @@ import ModuleItem from "../components/ModuleItem";
 // CONFIG
 import { colors } from "../core/Config"
 
-// STYLES
-// import { styles } from "../styles";
-
 export default function Dashboard({ }) {
     //1 - DECLARE VARIABLES
     // NAVIGATION
@@ -34,6 +31,8 @@ export default function Dashboard({ }) {
     // HOOKS
     // Get the current section from the Context
     const { section, setSection, sections, setSections } = useModuleContext();
+
+    const { width } = useWindowDimensions();
 
     // LOADING STATE AND ERROR
     const [
@@ -55,29 +54,22 @@ export default function Dashboard({ }) {
                 type: "ionicon",
                 color: "#fff",
                 style: { paddingLeft: 5 }
-            },
-            {
-                onPress: () => navigation.navigate('Favorites'),
-                name: "favorite",
-                type: "fontisto",
-                color: "#fff",
-                size: 20,
-                style: { paddingLeft: 5 }
             }
         ];
         navigation.setOptions({
             // headerTitle: section?.name || "Dashboard",
-            headerTitle: "",
+            // headerTitle: "",
+            headerTitle: renderFilterView,
             // if using a a nested screen in the Home scene   
             // headerLeft: () => <NavBackButton onPress={() => navigation.goBack()} />,
             // headerRight: () => <NavButtons buttons={navButtons} />,
 
             // if not using a a nested screen in the Home scene
             // or using this component as standalone screen or overriding the navigation config
-            headerLeft: () => <CustomNavTitle title={"MoFlix"} style={{ width: 200, paddingLeft: 14 }} titleStyle={{ color: colors.text, fontSize: 21 }} />,
-            headerRight: () => <NavButtons buttons={navButtons} />,
+            headerLeft: () => <CustomNavTitle title={"MoFlix"} style={{ width: 110, paddingLeft: 14 }} titleStyle={{ color: colors.text, fontSize: 21 }} />,
+            // headerRight: () => <NavButtons buttons={navButtons} />,
         });
-    }, [navigation]);
+    }, [navigation, sections]);
 
     //==========================================================================================
     // 2 - MAIN CODE BEGINS HERE
@@ -121,7 +113,6 @@ export default function Dashboard({ }) {
             // pass the selected section to the params instead
             if (section) params = { ...params, 'section_id': section.id }
             let response = await getPanels(params)
-
             // set the data
             setData(response?.panels || []);
             setError(null);
@@ -161,14 +152,20 @@ export default function Dashboard({ }) {
 
     // 3e - RENDER LOADING
     const renderLoading = () => {
-        return <ActivityIndicator style={{ backgroundColor: colors.primary, flex: 1 }} />
+        return <ActivityIndicator style={{ backgroundColor: colors.primary, flex:1 }} />
+    }
+
+    const renderFilterView = () => {
+        return (
+         <FilterView {...filterViewProps} />
+        )
     }
 
     // ==========================================================================================
     //4 -  ACTION HANDLERS
     //==========================================================================================
     // 4a - ON SECTION SELECTED
-    async function onSectionSelected(selected) {
+    function onSectionSelected(selected) {
         setSection(selected);
     };
 
@@ -190,21 +187,23 @@ export default function Dashboard({ }) {
             onPress: onPanelViewAllPress,
             renderItem: renderPanelItem
         }
-        return data.map(panel => ({ ...panel, ...sharedPanelProps }));
+        return data.map(panel => ({ ...panel, ...sharedPanelProps, onPress: panel?.cta ? onPanelViewAllPress : null }));
     }, [data]);
 
     //5b - FILTER VIEW PROPS
-    const filterViewProps = {
-        data: sections,
-        initialIndex: 0,
-        onItemPress: onSectionSelected,
-        containerStyle: { backgroundColor: "transparent" },
-        headerStyle: { color: colors.text },
-        ctaStyle: { color: colors.text },
-        selectedStyle: { backgroundColor: colors.secondary },
-        selectedTextStyle: { color: colors.text },
-        ...filterViewStyles,
-    }
+    const filterViewProps = useMemo(() => {
+        return {
+            data: sections,
+            initialIndex: 0,
+            onItemPress: onSectionSelected,
+            containerStyle: { backgroundColor: "transparent", width: width-100, marginLeft: 8 },
+            headerStyle: { color: colors.text },
+            ctaStyle: { color: colors.text },
+            selectedStyle: { backgroundColor: colors.secondary },
+            selectedTextStyle: { color: colors.text },
+            ...filterViewStyles,
+        }
+    }, [sections]);
 
     //5c - SCROLLVIEW PROPS
     const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refetchData} />
@@ -219,13 +218,13 @@ export default function Dashboard({ }) {
     //=========================================================================================
     return (
         <SafeAreaView style={[{ flex: 1, backgroundColor: colors.primary }]}>
-            {/* If using the the filter view */}
-            <FilterView {...filterViewProps} />
+            {/* If using the the filter view
+            {/* {renderFilterView()} */}
             {(isFetching) ? renderLoading() : (error) ? renderError() : (
                 <ScrollView {...scrollViewProps}>
                     <PanelContainer data={panels} />
                 </ScrollView>
-            )}
+            )} 
         </SafeAreaView>
     );
 };
@@ -235,7 +234,8 @@ const filterViewStyles = StyleSheet.create({
         backgroundColor: "transparent",
         borderWidth: 0,
         marginVertical: 0,
-        height: 34
+        height: 30,
+        marginRight: 4
     },
     itemTitleStyle: {
         fontSize: 14,

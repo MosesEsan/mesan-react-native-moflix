@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { SafeAreaView, FlatList } from 'react-native';
 
 // NAVIGATION
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
-import { useCRUD, DataStatusView, NavBackButton } from "react-native-helper-views";
+import { ErrorView, EmptyView, CustomNavTitle } from "react-native-helper-views";
 
 // SERVICES
 import { } from "../core/Service";
 
 // HOOKS
-import useFavorites from '../hooks/useFavorites';
+import { useFavoriteContext } from "../providers/FavoriteProvider";
 
 // COMPONENTS
 import ModuleItem from "../components/ModuleItem";
@@ -22,114 +22,84 @@ import { colors } from '../core/Config';
 // NUM OF COLUMNS
 const FLATLIST_COLUMNS = 3;
 
-// STYLES
-// import { styles } from "../styles";
 
 export default function Favorites(props) {
-    // 1 - DECLARE VARIABLES
+        // 1 - DECLARE VARIABLES
     // NAVIGATION
     const navigation = useNavigation();
-    const route = useRoute();
 
     // HOOKS
-    const { favorites, getFavorites } = useFavorites();
-
-    // LOADING STATE AND ERROR
-    const {
-        data, error,
-        isFetching, isRefreshing,
-        setData, setError,
-        setIsFetching, setIsRefreshing
-    } = useCRUD([])
+    // Get the favorites from the Context
+    const { favorites } = useFavoriteContext();
 
     //========================================================================================
     //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: "Favorites",
-            // headerRight: () => <NavButtons buttons={navButtons} />,
-            // headerLeft: () => <NavBackButton onPress={navigation.goBack} />, // If using a custom back button
+            headerTitle: "",
+            headerLeft: () => <CustomNavTitle title={"Favorites"} style={{ width: 150, paddingLeft: 14 }} titleStyle={{ color: colors.text, fontSize: 21 }} />,
         });
     }, [navigation]);
-    
-    //==========================================================================================
-    // 2 - MAIN CODE BEGINS HERE
-    // ==========================================================================================
-    useEffect(() => {
-        (async () => await getData())();
-    }, [])
-
-    //2b - GET DATA
-    async function getData(refresh = false, params = {}) {
-        // If not refreshing, empty the data array - OPTIONAL
-        if (!refresh) setData([])
-
-        setLoading(true, refresh);
-
-        try {
-            let response = await getFavorites(params)
-            onCompleted(response);
-        } catch (error) {
-            onError(error.message);
-        }
-    }
-
-    //===========================================================================================
-    //3 - API RESPONSE HANDLERS
-    //===========================================================================================
-    function onCompleted(data) {
-        setData(data);
-        setIsFetching(false)
-        setIsRefreshing(false)
-    }
-
-    function onError(error) {
-        setError(error.message)
-        setIsFetching(false)
-        setIsRefreshing(false)
-    }
 
     //==============================================================================================
-    //4 -  UI ACTION HANDLERS
+    //3 -  UI ACTION HANDLERS
     //==============================================================================================
-    //4A - RENDER ITEM
+    //3a - RENDER ITEM
     const renderItem = ({ item, index }) => {
-        return <ModuleItem type={'media-grid'} item={item}/>
+        return <ModuleItem type={'media-grid'} item={item} />
     }
 
-    //4b - RENDER EMPTY
+    //3b - RENDER EMPTY
     const renderEmpty = () => {
-        return <DataStatusView isFetching={isFetching} error={error} onRetry={() => getData(false)} />
+        let props = { color: colors.text }
+        let textProps = { titleStyle: props, textStyle: props }
+        return <EmptyView title={"No Data."} message={"No data to show"} {...textProps} />
     };
 
-    // ==========================================================================================
-    //5 -  ACTION HANDLERS
-    //==========================================================================================
+    //3c - RENDER FOOTER
+    // const renderFooter = () => {
+    //     return isFetchingNextPage ? (
+    //         <ActivityIndicator size="small" color={colors.text} style={{ height: 50 }} />
+    //     ) : null;
+    // };
+
+    // 3d - RENDER ERROR
+    const renderError = () => {
+        return <ErrorView message={error} onPress={() => getData(false)} />
+    }
+
+    // 3e - RENDER LOADING
+    const renderLoading = () => {
+        return <ActivityIndicator style={{ backgroundColor: colors.primary, flex: 1 }} />
+    }
 
     // ==========================================================================================
-    // 6 - RENDER VIEW
+    // 5 - VIEW PROPS
     //==========================================================================================
+    //5a - FLATLIST PROPS
     const listProps = {
         data: favorites,
         extraData: favorites,
         initialNumToRender: 10,
         numColumns: FLATLIST_COLUMNS,
 
-        style: { backgroundColor: colors.primary},
-        contentContainerStyle: { flexGrow: 1},
+        style: { backgroundColor: colors.primary },
+        contentContainerStyle: { flexGrow: 1 },
 
         renderItem: renderItem,
         ListEmptyComponent: renderEmpty,
 
-        keyExtractor: (item, index) => `item_favorite${index.toString()}`,
-        refreshing: isRefreshing,
-        onRefresh: () => getData(true)
+        keyExtractor: (item, index) => `item_favorite${index.toString()}`
     }
 
+    // ==========================================================================================
     // 6 - RENDER VIEW
+    //==========================================================================================
     return (
-        <SafeAreaView style={{backgroundColor: colors.primary, flex:1}}>
-            <FlatList {...listProps} data={data} />
+        <SafeAreaView style={{ backgroundColor: colors.primary, flex: 1 }}>
+            {(isFetching && !isFetchingNextPage) ? renderLoading() : (error) ? renderError() : (
+                <FlatList {...listProps} />
+            )}
         </SafeAreaView>
     );
 };
