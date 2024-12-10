@@ -25,24 +25,21 @@ import { colors } from '../core/Config';
 // NUM OF COLUMNS
 const FLATLIST_COLUMNS = 3;
 
-// STYLES
-// import { styles } from "../styles";
-
 export default function List(props) {
     // 1 - DECLARE VARIABLES
     // NAVIGATION
     const navigation = useNavigation();
-
-    // HOOKS
-    // if using Panels and/or Sections
-    // Get the section from the Context
-    const { section } = useModuleContext();
 
     // ROUTE PARAMS
     //Access the PARAMS data using:
     const route = useRoute();
     // if displaying the data for a specific panel
     const panel = route.params?.panel;
+
+    // HOOKS
+    // if using Panels and/or Sections
+    // Get the section from the Context
+    const { section } = useModuleContext();
 
     // if displaying the data for a specific category
     const category = route.params?.category;
@@ -60,7 +57,8 @@ export default function List(props) {
     const {
         data, error, // status
         isFetching, isFetchingNextPage, //isPending
-        hasNextPage, fetchNextPage,
+        hasNextPage, 
+        fetchNextPage,
     } = useInfiniteQuery({
         queryKey: ['list-data', section, category, panel, scene],
         queryFn: getData,
@@ -99,11 +97,12 @@ export default function List(props) {
         else return await getPanel(panel?.id, { page: pageParam });
     }
 
-    // 2c - GET DATA
-    // async function getData(refresh = false, params = {}) {
+    // 2b - GET DATA
+    // async function getData(refresh = false, params = {}, more = false) {
     //     try {
     //         // set the loading state
     //         setLoadingState(!refresh, refresh);
+    //         if (!more) setIsFetching(true);
 
     //         const response = null;
 
@@ -120,7 +119,7 @@ export default function List(props) {
     //     }
     // }
 
-    // 2c - GET DATA BY CATEGORY
+    // 2b1 - GET DATA BY CATEGORY
     async function getWithCategory(page) {
         let params = {
             "primary_release_date.lte": "31-12-2024",
@@ -130,7 +129,7 @@ export default function List(props) {
         return await getByCategory(category?.media_type || section.slug, params)
     }
 
-    // 2d - GET EPISODES
+    // 2b2 - GET EPISODES
     async function getEpisodes() {
         const series_id = route.params?.series_id;
         const season_number = route.params?.season_number;
@@ -141,11 +140,11 @@ export default function List(props) {
         return await getSeasonEpisodes(series_id, season_number);
     }
 
-    // // 2c - FETCH NEXT PAGE
-    // function fetchNextPage() {
-    //     if (nextPage) {
+    // 2c - FETCH NEXT PAGE
+    // async function fetchNextPage() {
+    //     if (hasNextPage) {
     //         setIsFetchingNextPage(true);
-    //         search(searchValue, nextPage, more = true);
+    //         await getData(false, true);
     //     }
     // }
     //==============================================================================================
@@ -192,11 +191,14 @@ export default function List(props) {
     // If using Infinite Scroll - Load More Data
     function onEndReached() {
         if (!isFetching && !isFetchingNextPage && hasNextPage) {
-            // setIsFetchingNextPage(true);
             fetchNextPage()
         }
     }
 
+    // ==========================================================================================
+    // 5 - VIEW PROPS
+    //==========================================================================================    
+    //5a - FLATLIST PROPS
     const listData = useMemo(() => {
         return data && data.pages.map(page => {
             // if the pages has the key results use it else check for the key episodes 
@@ -208,11 +210,7 @@ export default function List(props) {
             return []
         }).flat()
     }, [data]);
-
-    // ==========================================================================================
-    // 5 - VIEW PROPS
-    //==========================================================================================
-    //5a - FLATLIST PROPS
+    
     const listProps = {
         data: listData,
         extraData: listData,

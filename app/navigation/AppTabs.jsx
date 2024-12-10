@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createStackNavigator } from '@react-navigation/stack';
 
 import Icon from '@rneui/themed/dist/Icon';
 
@@ -11,9 +10,8 @@ import MainRoute, {
     ListScreen as ListRoute
 } from "../modules/main/core/Route";
 
-import { colors } from '../modules/main/core/Config';
-
 //1 - CONFIG
+import { colors } from '../modules/main/core/Config';
 const screenOptions = {
     headerStyle: {
         borderBottomWidth: 0,
@@ -39,7 +37,7 @@ export default function TabsStack() {
         tabBarActiveTintColor: "#ffffff",
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: { backgroundColor: colors.primary, borderTopWidth: 0 }
-    })
+    });
 
     const Tab = createBottomTabNavigator();
     return (

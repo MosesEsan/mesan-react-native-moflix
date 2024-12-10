@@ -86,7 +86,7 @@ export default function Search(props) {
     //2B - GET DATA
     async function search(query = searchValue, page = 1, more = false) {
         if (!more) setIsFetching(true);
-
+        
         // Cancel the previous request before making a new request
         if (cancelToken) cancelToken.cancel('Operation canceled by the user.');
 
@@ -119,7 +119,7 @@ export default function Search(props) {
     async function fetchNextPage() {
         if (nextPage) {
             setIsFetchingNextPage(true);
-            await search(searchValue, nextPage, more = true);
+            await search(searchValue, nextPage, true);
         }
     }
 
@@ -137,16 +137,6 @@ export default function Search(props) {
     const onClose = () => {
         navigation.goBack();
     }
-
-    // LIST DATA
-    const listData = useMemo(() => {
-        if (searchValue.length === 0) return categories
-        return data;
-        // return data && data.pages.map(page => {
-        //     if (page?.results) return page.data;
-        //     return []
-        // }).flat()
-    }, [searchValue, data, categories])
 
     //==============================================================================================
     //5 -  UI ACTION HANDLERS
@@ -200,6 +190,16 @@ export default function Search(props) {
     // 5 - VIEW PROPS
     //==========================================================================================
     //5a - FLATLIST PROPS
+    // LIST DATA
+    const listData = useMemo(() => {
+        if (searchValue.length === 0) return categories
+        return data;
+        // return data && data.pages.map(page => {
+        //     if (page?.results) return page.data;
+        //     return []
+        // }).flat()
+    }, [searchValue, data, categories])
+
     const listProps = {
         data: listData,
         extraData: listData,

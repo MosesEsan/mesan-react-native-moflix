@@ -35,33 +35,20 @@ export default function ModuleItem(props) {
 }
 
 
-
 // ==========================================================================================
 // MEDIA ITEM
-export function MediaItem(props) {
+export function MediaItem({item, fixed= true, type=null}) {
     // 1 - DECLARE VARIABLES
-    // PROPS DESTRUCTURING
-    const { item, fixed } = props;
-
     let size = null;
-    if (props?.type === "media-medium" || props?.type === "media-large"){
-        size = props?.type.split('-')[1];
+    if (type === "media-medium" || type === "media-large"){
+        size = type.split('-')[1];
     }
 
     // NAVIGATION
     const navigation = useNavigation();
 
-    // FAVORITES CONTEXT
-    // const { favorites = [], isFavorite, toggleFavorite } = useFavorites();
-
     // ==========================================================================================
     // 2 - ACTION HANDLERS
-    // const isItemFavorite = useMemo(() => {
-    //     return isFavorite(item);
-    // }, [favorites]);
-
-    // const onToggleFavorite = () => toggleFavorite(item)
-
     const onPress = () => navigation.navigate('Details', { item: item });
 
     // ==========================================================================================
@@ -77,6 +64,7 @@ export function MediaItem(props) {
             aspectRatio: 500 / 750,
             backgroundColor: colors.secondary
         },
+        
         title: {
             fontSize: 14,
             lineHeight: 16,
@@ -112,20 +100,11 @@ export function MediaItem(props) {
     )
 }
 
-MediaItem.defaultProps = {
-    fixed: true,
-}
-
 export function GridMediaItem(props) {
     const styles = {
         container: {
             flex: 1 / 3,
-            paddingBottom: 6,
-            position: 'relative',
-            width: '100%',
-            paddingRight: 4,
-            paddingLeft: 4,
-            paddingVertical: 4
+            padding: 4
         }
     }
     return (
@@ -153,11 +132,7 @@ export function CategoryItem(props) {
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
-
-            // padding: 10,
-            paddingHorizontal: 15,
-            // borderWidth: 1,
-            // borderColor:"green"
+            paddingHorizontal: 15
         },
 
         title: {

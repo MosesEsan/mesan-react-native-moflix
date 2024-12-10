@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { SafeAreaView, FlatList } from 'react-native';
 
 // NAVIGATION
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 // 3RD PARTY COMPONENTS
-import { NavButtons, NavBackButton, ErrorView, EmptyView, CustomNavTitle } from "react-native-helper-views";
+import { ErrorView, EmptyView, CustomNavTitle } from "react-native-helper-views";
 
 // SERVICES
 import { } from "../core/Service";
@@ -22,8 +22,6 @@ import { colors } from '../core/Config';
 // NUM OF COLUMNS
 const FLATLIST_COLUMNS = 3;
 
-// STYLES
-// import { styles } from "../styles";
 
 export default function Favorites(props) {
         // 1 - DECLARE VARIABLES
@@ -34,23 +32,12 @@ export default function Favorites(props) {
     // Get the favorites from the Context
     const { favorites } = useFavoriteContext();
 
-    // ROUTE PARAMS
-    //Access the PARAMS data using:
-    // const route = useRoute();
-
-    // LOADING STATE AND ERROR
-    // const [       
-    //     { data, error, page, nextPage, totalResults, isFetching, isRefreshing, isFetchingNextPage },
-    //     { setData, setError, setPage, setNextPage, setTotalResults, setIsFetching, setIsRefreshing, setLoadingState, setIsFetchingNextPage, setAPIResponse }
-    // ] = useFetch();
-
     //========================================================================================
     //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: "",
             headerLeft: () => <CustomNavTitle title={"Favorites"} style={{ width: 150, paddingLeft: 14 }} titleStyle={{ color: colors.text, fontSize: 21 }} />,
-            // headerRight: () => <NavButtons buttons={navButtons} />,
         });
     }, [navigation]);
 
@@ -102,9 +89,7 @@ export default function Favorites(props) {
         renderItem: renderItem,
         ListEmptyComponent: renderEmpty,
 
-        keyExtractor: (item, index) => `item_favorite${index.toString()}`,
-        refreshing: isRefreshing,
-        onRefresh: () => getData(true)
+        keyExtractor: (item, index) => `item_favorite${index.toString()}`
     }
 
     // ==========================================================================================

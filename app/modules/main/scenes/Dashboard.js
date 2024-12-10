@@ -23,7 +23,6 @@ import ModuleItem from "../components/ModuleItem";
 // CONFIG
 import { colors } from "../core/Config"
 
-
 export default function Dashboard({ }) {
     //1 - DECLARE VARIABLES
     // NAVIGATION
@@ -166,7 +165,7 @@ export default function Dashboard({ }) {
     //4 -  ACTION HANDLERS
     //==========================================================================================
     // 4a - ON SECTION SELECTED
-    async function onSectionSelected(selected) {
+    function onSectionSelected(selected) {
         setSection(selected);
     };
 
