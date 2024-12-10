@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Text, ImageBackground, View, Image, Pressable } from 'react-native';
+import { Text, ImageBackground, View, Image, Pressable, Alert, Linking } from 'react-native';
 
 // NAVIGATION
 import { useNavigation } from "@react-navigation/native";
@@ -408,7 +408,18 @@ function VideoItem(props) {
         },
     }
 
-    let onPress = () => navigation.navigate('MediaPlayer', { video: item });
+    let url = `https://www.youtube.com/watch?v=${item.key}`;
+    let onPress = async () => {
+        Alert.alert(`Watch ${item.type }`, 'This video will be opened on the YouTube Website or the YouTube App if available.', [
+            {
+              text: 'Cancel',
+              onPress: () => console.log('Cancel Pressed'),
+              style: 'cancel',
+            },
+            {text: 'OK', onPress: async () => await Linking.openURL(url)},
+          ]);
+    }
+        
     return (
         <Pressable onPress={onPress}>
             <View style={styles.container}>
