@@ -117,7 +117,7 @@ export default function Details(props) {
             // VIDEOS
             {
                 id: 2,
-                title: "Videos",
+                title: "Trailers & Behind the Scene",
                 type: "carousel",
                 itemType: "video",
                 data: videos
