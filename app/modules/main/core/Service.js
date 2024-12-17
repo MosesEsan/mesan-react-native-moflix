@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { CRUD_API_URL, SECTIONS_ENDPOINT, PANELS_ENDPOINT, TMDB_API_URL, DISCOVER_ENDPOINT, SEARCH_ENDPOINT } from './Config';
+import { CRUD_API_URL, TMDB_API_TOKEN, SECTIONS_ENDPOINT, PANELS_ENDPOINT, TMDB_API_URL, DISCOVER_ENDPOINT, SEARCH_ENDPOINT, PERSON_ENDPOINT } from './Config';
 
 export const HEADERS = {
     headers: {
         accept: 'application/json',
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhM2UzYTFkNzkyMzVhMWVmMTg5ZGJiMGMyNDNmMjQwZSIsIm5iZiI6MTcyNjAxMTkzNS4zMTY3ODUsInN1YiI6IjU2MDJkMDc0YzNhMzY4NTU0MTAwMjE5MyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.j0uqlo6JAwjS1dKZoakPNgls0R1g1kCA5gwmWhmH3mw`
+        Authorization: `Bearer ${TMDB_API_TOKEN}`
     }
 }
 // =============================================================================================
@@ -39,7 +39,7 @@ export async function getSections() {
 
 // Get Section Panels
 export async function getPanels(params = {}) {
-    return await apiCall(`${CRUD_API_URL}${SECTIONS_ENDPOINT}/${params['section_id']}/${PANELS_ENDPOINT}`, params);
+    return await apiCall(`${CRUD_API_URL}${SECTIONS_ENDPOINT}${params['section_id']}/${PANELS_ENDPOINT}`);
 }
 
 // Get Panel Data
@@ -55,7 +55,6 @@ export async function getCategories(section, params) {
     return await apiCall(`${TMDB_API_URL}genre/${section}/list`, params, HEADERS);
 }
 
-
 export async function getAllCategories() {
     const urls =  [
         axios.get(`${TMDB_API_URL}genre/movie/list`, HEADERS),
@@ -69,11 +68,10 @@ export async function getAllCategories() {
             response[key] = result.data.genres.map(item => ({...item, media_type: key}));
         });
         return response;
-    } catch (error) {
-        return { error: error.message };
+    } catch (e) {
+        throw new Error(e);
     }
 }
-
 
 // GET CATEGORY DATA - READ
 export async function getByCategory(section, params) {
@@ -103,4 +101,12 @@ export async function getCredits(section, id, params = {}) {
 // SEARCH BY NAME
 export async function searchByName(mediaType='multi', params) {
     return apiCall(`${TMDB_API_URL}${SEARCH_ENDPOINT}${mediaType}`, params, HEADERS);
+}
+
+// ==========================================================================================
+// PEOOPLE ENDPOINT
+// ==========================================================================================
+// GET PERSON INFO
+export async function getPersonDetails(person_id, params) {
+    return apiCall(`${TMDB_API_URL}${PERSON_ENDPOINT}${person_id}`, params, HEADERS);
 }
