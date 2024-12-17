@@ -7,17 +7,17 @@ import { useNavigation } from "@react-navigation/native";
 // 3RD PARTY COMPONENTS
 
 // CONFIG
-import { colors, YOUTUBE_URL } from "../core/Config"
+import { colors, IMAGE_URL } from "../core/Config"
 
-export default function MediaVerticalItem(props) {
+export default function PeopleItem(props) {
     // 1 - DECLARE VARIABLES
     // PROPS DESTRUCTURING
-    const { item } = props;
+    const { item, fixed } = props;
 
     // NAVIGATION
     const navigation = useNavigation();
 
-    const onPress = () => navigation.navigate('Details', { item: item });
+    const onPress = () => navigation.navigate('Person', { item: item });
 
     // ==========================================================================================
     // Styles
@@ -48,13 +48,7 @@ export default function MediaVerticalItem(props) {
             paddingRight: 4,
             paddingLeft: 4,
             paddingVertical: 4
-        },
-        character: {
-            fontSize: 14,
-            lineHeight: 19,
-            fontWeight: "400",
-            color: "gray"
-        },
+        }
     }
 
     const { width: windowWidth } = useWindowDimensions();
@@ -62,8 +56,8 @@ export default function MediaVerticalItem(props) {
     let containerStyle = [styles.container, { width }];
     let style = [styles.image, { width }]
     const renderImage = () => {
-        let source = { uri: item?.image ? `${item.image}` : require("../images/media-empty.png") };
-        return <ImageBackground imageStyle={style} style={[style]} source={source} />
+        let source = { uri: item?.profile_path ? `${IMAGE_URL}${item.profile_path}` : require("../images/media-empty.png") };
+        return <ImageBackground imageStyle={[styles.image, style]} style={[style]} source={source} />
     }
 
     // ==========================================================================================
@@ -74,8 +68,22 @@ export default function MediaVerticalItem(props) {
             <View style={[containerStyle, props?.grid && { width: "100%" }]}>
                 {renderImage()}
                 <Text style={styles.title} numberOfLines={2}>{item?.title || item?.name}</Text>
-                {item?.character && <Text style={styles.character} numberOfLines={2}>{item?.character}</Text>}
             </View>
         </Pressable>
+    )
+}
+
+
+export function GridPeopleItem(props) {
+    const styles = {
+        container: {
+            flex: 1 / 3,
+            padding: 4
+        }
+    }
+    return (
+        <View style={styles.container}>
+            <PeopleItem {...props} grid={true} />
+        </View>
     )
 }

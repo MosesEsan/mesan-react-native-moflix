@@ -9,6 +9,7 @@ import SpotlightLargeItem from './SpotlightLargeItem';
 import MediaVerticalItem from './MediaVerticalItem';
 import SpotlightItem from './SpotlightItem';
 import ShowCaseItem from './ShowCaseItem';
+import PeopleItem, { GridPeopleItem }from './PeopleItem';
 
 // CONFIG
 import { colors, IMAGE_URL, LARGE_IMAGE_URL } from "../core/Config"
@@ -28,6 +29,8 @@ export default function ModuleItem(props) {
         item['image'] = item.poster_path ? `${IMAGE_URL}${item.poster_path}` : null;
         return <MediaVerticalItem {...props} />
     }
+    else if (type === "people" || type === "person") return <PeopleItem {...props} />
+    else if (type === "people-grid"  || type === "person-grid") return <GridPeopleItem {...props} />
     else if (type === "media-grid") return <GridMediaItem item={item} {...props} />
     else if (type === "category-grid") return <CategoryItem {...props} style={{ height: 55, borderRadius: 0}} />
     else if (type === "spotlight") return <SpotlightItem {...props} />
