@@ -14,6 +14,9 @@ import { useFavoriteContext } from "../providers/FavoriteProvider";
 // CONFIG
 import { colors, IMAGE_URL, LARGE_IMAGE_URL, YOUTUBE_URL } from "../core/Config"
 
+// COMPONENTS
+import MainItem from './Details/MainItem';
+
 export default function DetailItem(props) {
     const { type } = props;
     if (type === "header") return <HeaderItem {...props} />
@@ -94,108 +97,6 @@ function HeaderItem({ item }) {
     )
 }
 
-// ==========================================================================================
-// MAIN ITEM
-function MainItem(props) {
-    const { item } = props;
-    const { overview } = item;
-    const { backdrop_path, languages, genres, runtime, number_of_seasons, date } = useTMDB(item);
-
-    const PADDING = 15
-    const styles = {
-        metaContainer: {
-            paddingHorizontal: PADDING,
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: PADDING,
-        },
-
-        title: {
-            fontSize: 23,
-            lineHeight: 29,
-            fontWeight: "700",
-            color: "white",
-            textAlign: "center",
-        },
-
-        subtitle: {
-            fontSize: 14,
-            lineHeight: 16,
-            fontWeight: "500",
-            color: "white",
-            marginTop: 8,
-            textAlign: "center"
-        },
-
-        genresContainer: {
-            flexDirection: "row",
-            justifyContent: "center",
-            marginTop: PADDING,
-        },
-
-        genreContainer: {
-            height: 34,
-            borderRadius: 50,
-            backgroundColor: colors.secondary,
-
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-
-            paddingHorizontal: 15,
-            marginHorizontal: 8
-        },
-
-        genreTitle: {
-            fontSize: 14,
-            lineHeight: 19,
-            fontWeight: "400",
-            color: "#fff"
-        },
-
-        descriptionContainer: {
-            flex: 1,
-            paddingHorizontal: PADDING,
-            marginVertical: PADDING * 1.5,
-        },
-
-        description: {
-            fontSize: 16,
-            lineHeight: 21,
-            fontWeight: "400",
-            color: "#fff",
-        }
-    };
-
-    return (
-        <View>
-            <View style={[styles.metaContainer]}>
-                <Text style={styles.title}>
-                    {item?.title || item?.name}
-                </Text>
-                <Text style={styles.subtitle} numberOfLines={2}>
-                    {`${languages} |`} {`${date}`} | {`${runtime || number_of_seasons}`}
-                </Text>
-            </View>
-
-            <View style={styles.genresContainer}>
-                {
-                    genres.map((genre, index) => {
-                        return (
-                            <View style={[styles.genreContainer]} key={index}>
-                                <Text style={styles.genreTitle}>{genre.name}</Text>
-                            </View>
-                        )
-                    })
-                }
-            </View>
-            <View style={styles.descriptionContainer}>
-                {item?.overview && <Text style={styles.description}>{overview}</Text>}
-            </View>
-        </View>
-
-    )
-}
 
 // ==========================================================================================
 // CAST CREW ITEM
@@ -240,7 +141,7 @@ function CastCrewItem(props) {
 
     let subtitle = item?.character || item?.job;
     if (item?.roles) subtitle = item?.roles[0]?.character || "";
-    else if (item?.jobs) subtitle = item?.jobs[0]?.job  || "";
+    else if (item?.jobs) subtitle = item?.jobs[0]?.job || "";
 
     return (
         <View style={[styles.container]}>
@@ -410,16 +311,16 @@ function VideoItem(props) {
 
     let url = `https://www.youtube.com/watch?v=${item.key}`;
     let onPress = async () => {
-        Alert.alert(`Watch ${item.type }`, 'This video will be opened on the YouTube Website or the YouTube App if available.', [
+        Alert.alert(`Watch ${item.type}`, 'This video will be opened on the YouTube Website or the YouTube App if available.', [
             {
-              text: 'Cancel',
-              onPress: () => console.log('Cancel Pressed'),
-              style: 'cancel',
+                text: 'Cancel',
+                onPress: () => console.log('Cancel Pressed'),
+                style: 'cancel',
             },
-            {text: 'OK', onPress: async () => await Linking.openURL(url)},
-          ]);
+            { text: 'OK', onPress: async () => await Linking.openURL(url) },
+        ]);
     }
-        
+
     return (
         <Pressable onPress={onPress}>
             <View style={styles.container}>
