@@ -2,11 +2,13 @@ import React, { } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 // 3RD PARTY COMPONENTS
-import { Icon, SearchBar } from '@rneui/themed';
-import { FilterView } from "react-native-filter-component";
+import { SearchBar } from '@rneui/themed';
 
 // CONFIG
 import { colors } from "../core/Config";
+
+// COMPONENTS
+import FilterAndSortView from './Search/FilterAndSortView';
 
 export default function SearchBarContainer({
     searchValue,
@@ -28,14 +30,7 @@ export default function SearchBarContainer({
     };
 
     //FILTERVIEW PROPS
-    const filterViewProps = {
-        data: filters,
-        misc: filter ? [filter] : [],
-        initialIndex: 0,
-        onItemPress: _onFilterItemSeleted,
-        ...filterViewStyles,
-    }
-
+    const filterSortViewProps = { filters, filter, initialIndex: 0, onItemPress: _onFilterItemSeleted }
     return (
         <>
             <View style={{ flexDirection: "row", paddingHorizontal: 4 }}>
@@ -54,18 +49,7 @@ export default function SearchBarContainer({
                 </Pressable> */}
             </View>
             {
-                showFilter &&
-                <View style={{ flexDirection: "row", alignItems:"center", paddingBottom: 6}}>
-                    <FilterView {...filterViewProps} />
-                    {
-                        onSortByPress &&
-                        <Pressable onPress={onSortByPress}>
-                            <View style={{ width: 50, height: 40, justifyContent:"center" }}>
-                                <Icon size={16} name={"sort"} type="font-awesome" color={"white"} />
-                            </View>
-                        </Pressable>
-                    }
-                </View>
+                showFilter && <FilterAndSortView {...filterSortViewProps}/>
             }
         </>
     );
@@ -101,30 +85,4 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontWeight: "6i00"
     }
-});
-
-const filterViewStyles = StyleSheet.create({
-    headerStyle: { color: "white" },
-    containerStyle: {
-        backgroundColor: "transparent",
-        flex:1
-    },
-    itemContainerStyle: {
-        backgroundColor: "transparent",
-        borderWidth: 0,
-        height: 30,
-        marginVertical: 0,
-    },
-    itemTitleStyle: {
-        fontSize: 14,
-        color: "white",
-        fontWeight: "500"
-    },
-    selectedStyle: {
-        backgroundColor: "rgb(45, 45, 45)"
-    },
-    selectedTitleStyle: {
-        color: "#fff",
-    },
-    ctaStyle: { color: "#fff" },
 });
