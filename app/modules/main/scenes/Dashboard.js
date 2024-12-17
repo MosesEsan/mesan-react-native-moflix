@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { SafeAreaView, ActivityIndicator, ScrollView, RefreshControl, StyleSheet, View, useWindowDimensions } from 'react-native';
 
 // NAVIGATION
@@ -12,7 +12,6 @@ import { ErrorView, NavButtons, CustomNavTitle } from "react-native-helper-views
 
 // HOOKS
 import useFetch from '../hooks/useFetch';
-import { useModuleContext } from "../core/Provider";
 
 // SERVICES
 import { getSections, getPanels } from "../core/Service";
@@ -29,8 +28,8 @@ export default function Dashboard({ }) {
     const navigation = useNavigation();
 
     // HOOKS
-    // Get the current section from the Context
-    const { section, setSection, sections, setSections } = useModuleContext();
+    const [sections, setSections] = useState();
+    const [section, setSection] = useState();
 
     const { width } = useWindowDimensions();
 
@@ -75,13 +74,15 @@ export default function Dashboard({ }) {
     // 2 - MAIN CODE BEGINS HERE
     // ==========================================================================================
     useEffect(() => {
-        //if (isLoggedIn) await getData()
+        //if (isLoggedIn) await getData({})
         (async () => await getDashbordSections())();
     }, []); //}, [isLoggedIn])
 
     useEffect(() => {
         (async () => {
-            if (section) await getData();
+            if (section) {
+                await getData({ section });
+            }
         })();
     }, [section]);
 
@@ -105,7 +106,7 @@ export default function Dashboard({ }) {
     }
 
     // 2c - GET DATA
-    async function getData(refresh = false, params = {}) {
+    async function getData({ section, refresh = false, params = {} }) {
         try {
             // set the loading state
             setLoadingState(!refresh, refresh);
@@ -126,14 +127,14 @@ export default function Dashboard({ }) {
     // 2c - REFRESH DATA
     async function refetchData() {
         setIsRefreshing(true);
-        await getData(true);
+        await getData({ refresh: true, section });
     }
 
     // 2d - FETCH NEXT PAGE
     async function fetchNextPage() {
         if (nextPage) {
             setIsFetchingNextPage(true);
-            await getData(false, more = true);
+            await getData({ refresh: false, more: true });
         }
     }
 
@@ -147,17 +148,18 @@ export default function Dashboard({ }) {
 
     // 3d - RENDER ERROR
     const renderError = () => {
-        return <ErrorView message={error} onPress={getData} />
+        const onPress = () => getData({ section });
+        return <ErrorView message={error} onPress={onPress} titleStyle={{ color: "#fff" }} />
     }
 
     // 3e - RENDER LOADING
     const renderLoading = () => {
-        return <ActivityIndicator style={{ backgroundColor: colors.primary, flex:1 }} />
+        return <ActivityIndicator style={{ backgroundColor: colors.primary, flex: 1 }} />
     }
 
     const renderFilterView = () => {
         return (
-         <FilterView {...filterViewProps} />
+            <FilterView {...filterViewProps} />
         )
     }
 
@@ -196,7 +198,7 @@ export default function Dashboard({ }) {
             data: sections,
             initialIndex: 0,
             onItemPress: onSectionSelected,
-            containerStyle: { backgroundColor: "transparent", width: width-100, marginLeft: 8 },
+            containerStyle: { backgroundColor: "transparent", width: width - 100, marginLeft: 8 },
             headerStyle: { color: colors.text },
             ctaStyle: { color: colors.text },
             selectedStyle: { backgroundColor: colors.secondary },
@@ -224,7 +226,7 @@ export default function Dashboard({ }) {
                 <ScrollView {...scrollViewProps}>
                     <PanelContainer data={panels} />
                 </ScrollView>
-            )} 
+            )}
         </SafeAreaView>
     );
 };
