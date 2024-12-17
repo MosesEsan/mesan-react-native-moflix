@@ -9,9 +9,10 @@ import MediaPlayer from '../scenes/MediaPlayer';
 import FavoritesScreen from '../scenes/Favorites';
 import SearchScreen from '../scenes/Search';
 import CreditsScreen from '../scenes/Credits';
+import PersonScreen from '../scenes/Person'
 
 // EXPORT THE SCREEN SHARED BY MULTIPLE SECTION, E.G. The Favorites screen will need access to the Details Screen
-export { SearchScreen, FavoritesScreen, ListScreen, DetailsScreen, CreditsScreen, MediaPlayer };
+export { SearchScreen, FavoritesScreen, ListScreen, DetailsScreen, CreditsScreen, MediaPlayer, PersonScreen };
 
 // CONFIG
 import { colors } from './Config';

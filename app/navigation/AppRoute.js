@@ -16,7 +16,7 @@ import {
   ListScreen,
   DetailsScreen,
   CreditsScreen,
-  MediaPlayer
+  PersonScreen
 } from "../modules/main/core/Route";
 
 // CONFIG
@@ -47,10 +47,11 @@ export default function AppRoute() {
       <NavigationContainer>
         <RootStack.Navigator>
           <RootStack.Group>
+            {/* Any screen that needs to be accessed from an of the tabs has to outside the Tabs Route */}
             <RootStack.Screen name="App" component={AppTabs} options={{ headerShown: false }} />
             <RootStack.Screen name={"List"} component={ListScreen} options={{ ...screenOptions }} />
             <RootStack.Screen name={"Credits"} component={CreditsScreen} options={{ ...screenOptions }} />
-            <RootStack.Screen name={"MediaPlayer"} component={MediaPlayer} options={{ ...screenOptions }} />
+            <RootStack.Screen name={"Person"} component={PersonScreen} options={{ ...screenOptions }} />
           </RootStack.Group>
           <RootStack.Group screenOptions={{ presentation: 'modal' }}>
             <RootStack.Screen name={"Details"} component={DetailsScreen} options={{ headerShown: false }} />
