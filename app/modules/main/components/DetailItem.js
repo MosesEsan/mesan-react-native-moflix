@@ -15,12 +15,14 @@ import { useFavoriteContext } from "../providers/FavoriteProvider";
 import { colors, IMAGE_URL, LARGE_IMAGE_URL, YOUTUBE_URL } from "../core/Config"
 
 // COMPONENTS
+import PersonInfoItem from './People/PersonInfoItem';
 import MainItem from './Details/MainItem';
 
 export default function DetailItem(props) {
     const { type } = props;
     if (type === "header") return <HeaderItem {...props} />
     else if (type === "main") return <MainItem {...props} />
+    else if (type === "person") return <PersonInfoItem {...props} />
     else if (type === "seasons") return <SeasonsItem {...props} />
     else if (type === "credits") return <CastCrewItem {...props} />
     else if (type === "video") return <VideoItem {...props} />

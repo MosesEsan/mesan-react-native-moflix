@@ -9,7 +9,7 @@ import SpotlightLargeItem from './SpotlightLargeItem';
 import MediaVerticalItem from './MediaVerticalItem';
 import SpotlightItem from './SpotlightItem';
 import ShowCaseItem from './ShowCaseItem';
-import PeopleItem, { GridPeopleItem }from './PeopleItem';
+import PeopleItem, { GridPeopleItem }from './People/PeopleItem';
 
 // CONFIG
 import { colors, IMAGE_URL, LARGE_IMAGE_URL } from "../core/Config"

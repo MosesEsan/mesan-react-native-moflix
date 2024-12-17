@@ -4,10 +4,8 @@ import { Text, ImageBackground, View, Pressable, useWindowDimensions } from 'rea
 // NAVIGATION
 import { useNavigation } from "@react-navigation/native";
 
-// 3RD PARTY COMPONENTS
-
 // CONFIG
-import { colors, IMAGE_URL } from "../core/Config"
+import { colors, IMAGE_URL } from "../../core/Config"
 
 export default function PeopleItem(props) {
     // 1 - DECLARE VARIABLES
@@ -56,7 +54,7 @@ export default function PeopleItem(props) {
     let containerStyle = [styles.container, { width }];
     let style = [styles.image, { width }]
     const renderImage = () => {
-        let source = { uri: item?.profile_path ? `${IMAGE_URL}${item.profile_path}` : require("../images/media-empty.png") };
+        let source = { uri: item?.profile_path ? `${IMAGE_URL}${item.profile_path}` : require("../../images/media-empty.png") };
         return <ImageBackground imageStyle={[styles.image, style]} style={[style]} source={source} />
     }
 
