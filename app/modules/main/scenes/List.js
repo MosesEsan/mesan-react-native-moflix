@@ -10,7 +10,9 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 
 // HOOKS
 // import useFetch from '../hooks/useFetch';
-import { useModuleContext } from "../core/Provider";
+
+// PROVIDERS
+//import { useModuleContext } from "../core/Provider";
 
 // SERVICES
 import { getPanel, getByCategory, getSeasonEpisodes } from "../core/Service";
@@ -36,11 +38,6 @@ export default function List(props) {
     // if displaying the data for a specific panel
     const panel = route.params?.panel;
 
-    // HOOKS
-    // if using Panels and/or Sections
-    // Get the section from the Context
-    const { section } = useModuleContext();
-
     // if displaying the data for a specific category
     const category = route.params?.category;
 
@@ -53,19 +50,23 @@ export default function List(props) {
     // the flatlist defults to 2 columns, to change this, a props can be pased
     const columns = (panel && panel?.item_type === "category") ? 2 : route.params?.columns || FLATLIST_COLUMNS;
 
+    // HOOKS
+
     // LOADING STATE AND ERROR
     const {
         data, error, // status
         isFetching, isFetchingNextPage, //isPending
+        isRefetching,
         hasNextPage, 
         fetchNextPage,
+        refetch
     } = useInfiniteQuery({
-        queryKey: ['list-data', section, category, panel, scene],
+        queryKey: ['list-data', category, panel, scene],
         queryFn: getData,
         initialPageParam: 1,
         getNextPageParam: (lastPage, allPages, lastPageParam) => {
             // only attempt to fetch the next page if we viewing a category and the last page has less than the total pages
-            if (!category) return undefined
+            if (!category && (panel && panel?.item_type !== "people")) return undefined
             return lastPage && lastPageParam < lastPage.total_pages ? lastPageParam + 1 : undefined;
         },
         getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
@@ -80,6 +81,15 @@ export default function List(props) {
     //========================================================================================
     //1B -NAVIGATION CONFIG - Custom Title and Right Nav Buttons
     useLayoutEffect(() => {
+        // const navButtons = [
+        //     {
+        //         onPress: null,
+        //         name: "sort",
+        //         type: "font-awesome",
+        //         color: "#fff",
+        //         style: { paddingLeft: 5 }
+        //     }
+        // ];
         navigation.setOptions({
             headerTitle: panel?.title || category?.name || route.params?.title || "",
             // headerRight: () => <NavButtons buttons={navButtons} />,
@@ -87,9 +97,12 @@ export default function List(props) {
         });
     }, [navigation]);
 
+    
     //==========================================================================================
     // 2 - MAIN CODE BEGINS HERE
     // ==========================================================================================
+    //2a - USE EFFECT
+
     //2b - GET DATA
     async function getData({ pageParam }) {
         if (category) return await getWithCategory(pageParam);
@@ -122,11 +135,11 @@ export default function List(props) {
     // 2b1 - GET DATA BY CATEGORY
     async function getWithCategory(page) {
         let params = {
-            "primary_release_date.lte": "31-12-2024",
             page: page,
             with_genres: category.id
         }
-        return await getByCategory(category?.media_type || section.slug, params)
+
+        return await getByCategory(category?.media_type, params)
     }
 
     // 2b2 - GET EPISODES
@@ -138,6 +151,13 @@ export default function List(props) {
             navigation.goBack();
         }
         return await getSeasonEpisodes(series_id, season_number);
+    }
+
+
+    // 2c - REFRESH DATA
+    async function refetchData() {
+        //setIsRefreshing(true);
+        await refetch();
     }
 
     // 2c - FETCH NEXT PAGE
@@ -153,8 +173,10 @@ export default function List(props) {
     //3a - RENDER ITEM
     const renderItem = ({ item, index }) => {
         // if displaying the data for a specific panel and the panel media_type is "category"
-        // render the GridCategoryItem
-        if (panel && panel?.item_type === "category") return <ModuleItem type={'category-grid'} item={item} />
+        if (panel && panel?.item_type === "category" || panel?.item_type === "people") {
+            const type = panel?.item_type === "category" ? 'category-grid' : 'people-grid' ;
+            return <ModuleItem type={type} item={item} />
+        }
 
         if (scene) return <DetailItem type={scene} item={item} />
 
@@ -224,8 +246,8 @@ export default function List(props) {
         ListEmptyComponent: renderEmpty,
 
         keyExtractor: (item, index) => `item_${item['id'].toString()}${index.toString()}`,
-        refreshing: isRefreshing,
-        onRefresh: () => getData(true),
+        refreshing: isRefetching,
+        onRefresh: refetchData,
 
         // If using Infinite Scroll
         onEndReached,
