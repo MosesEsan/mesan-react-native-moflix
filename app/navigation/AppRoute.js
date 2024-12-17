@@ -14,6 +14,7 @@ import AppTabs from './AppTabs';
 // if using tabs and a view is shared by multiple sections, import it here
 import {
   ListScreen,
+  MoviesScreen,
   DetailsScreen,
   CreditsScreen,
   PersonScreen
@@ -49,6 +50,7 @@ export default function AppRoute() {
           <RootStack.Group>
             {/* Any screen that needs to be accessed from an of the tabs has to outside the Tabs Route */}
             <RootStack.Screen name="App" component={AppTabs} options={{ headerShown: false }} />
+            <RootStack.Screen name={"Movies"} component={MoviesScreen} options={{ ...screenOptions }} />
             <RootStack.Screen name={"List"} component={ListScreen} options={{ ...screenOptions }} />
             <RootStack.Screen name={"Credits"} component={CreditsScreen} options={{ ...screenOptions }} />
             <RootStack.Screen name={"Person"} component={PersonScreen} options={{ ...screenOptions }} />

@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 // SCENES
 import DashboardScreen from '../scenes/Dashboard';
 import ListScreen from '../scenes/List';
+import MoviesScreen from "../scenes/Movies"
 import DetailsScreen from '../scenes/Details';
 import MediaPlayer from '../scenes/MediaPlayer';
 import FavoritesScreen from '../scenes/Favorites';
@@ -12,7 +13,7 @@ import CreditsScreen from '../scenes/Credits';
 import PersonScreen from '../scenes/Person'
 
 // EXPORT THE SCREEN SHARED BY MULTIPLE SECTION, E.G. The Favorites screen will need access to the Details Screen
-export { SearchScreen, FavoritesScreen, ListScreen, DetailsScreen, CreditsScreen, MediaPlayer, PersonScreen };
+export { SearchScreen, FavoritesScreen, ListScreen, MoviesScreen, DetailsScreen, CreditsScreen, MediaPlayer, PersonScreen };
 
 // CONFIG
 import { colors } from './Config';

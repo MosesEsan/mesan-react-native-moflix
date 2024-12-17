@@ -123,7 +123,7 @@ export function CategoryItem(props) {
     const navigation = useNavigation();
     const { item } = props;
 
-    let onPress = () => navigation.push('List', { category: item });
+    let onPress = () => navigation.push('Movies', { category: item });
 
     const styles = {
         container: {
