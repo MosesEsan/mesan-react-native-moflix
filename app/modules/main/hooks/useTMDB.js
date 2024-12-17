@@ -12,12 +12,13 @@ const useTMDB = (item) => {
         number_of_seasons=null,
         backdrop_path=null,
         poster_path=null,
-        first_air_date = null
+        first_air_date = null,
+        vote_average = null
     } = item;
     const { crew = [] } = credits;
 
     // Join the spoken_languages array into a string
-    let languages = spoken_languages.map(item => item.english_name).join(', ');
+    let languages = spoken_languages.map(item => item.english_name).join(' / ');
 
     // Join the genres array into a string
     let genresString = genres.map(item => item.name).join(', ');
@@ -55,7 +56,8 @@ const useTMDB = (item) => {
         videos, cast,
         release_date,
         first_air_date,
-        date, year
+        date, year,
+        vote_average
     }
 }
 
